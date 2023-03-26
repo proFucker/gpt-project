@@ -1,0 +1,6 @@
+*.class
+*.jar
+gpt-core/build/
+gpt-example/build/
+gradle/
+.gradle/
