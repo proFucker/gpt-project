@@ -24,8 +24,7 @@ public class GPTExampleApplication {
         try {
 
             String modelName = "gpt-3.5-turbo";
-//            String token = "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";
-            String token = "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";
+            String token = "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";
             OpenAiService service = new OpenAiService(buildApi(token, Duration.ofSeconds(60)));
             List<Model> models = service.listModels();
             System.out.println(1);
