@@ -7,11 +7,13 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.service.OpenAiService;
 import com.xfd.entity.UserDescribe;
+import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
 import static com.theokanning.openai.service.OpenAiService.buildApi;
 
+@Service
 public class GPTService {
 
     private OpenAiService service;

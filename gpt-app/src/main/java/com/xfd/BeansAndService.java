@@ -11,8 +11,4 @@ public class BeansAndService {
         return new LocalCacheService();
     }
 
-    @Bean
-    public GPTService initGPTService() {
-        return new GPTService();
-    }
 }
