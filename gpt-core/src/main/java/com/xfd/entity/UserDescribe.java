@@ -1,4 +1,4 @@
-package com.gpt.describe;
+package com.xfd.entity;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -2,5 +2,8 @@
 *.jar
 gpt-core/build/
 gpt-example/build/
+gpt-app/build/
 gradle/
 .gradle/
+build/
+*.iml

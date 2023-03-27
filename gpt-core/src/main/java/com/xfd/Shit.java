@@ -1,4 +1,4 @@
-package com.gpt;
+package com.xfd;
 
 public class Shit {
 

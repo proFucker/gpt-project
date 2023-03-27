@@ -1,4 +1,6 @@
 rootProject.name = 'gpt-project'
 include 'gpt-example'
 include 'gpt-core'
+include 'gpt-app'
+include 'gpt-util'
 

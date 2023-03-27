@@ -1,15 +1,12 @@
-package com.gpt.example;
+package com.xfd.example;
 
 import com.google.common.collect.Lists;
-import com.gpt.Shit;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
-import com.theokanning.openai.image.CreateImageRequest;
-import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
 import com.theokanning.openai.service.OpenAiService;
 
