@@ -13,7 +13,7 @@ import java.time.Duration;
 
 import static com.theokanning.openai.service.OpenAiService.buildApi;
 
-@Service
+//@Service
 public class GPTService {
 
     private OpenAiService service;

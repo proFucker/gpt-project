@@ -2,7 +2,6 @@ package com.xfd;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 
