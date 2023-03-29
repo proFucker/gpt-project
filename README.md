@@ -9,8 +9,11 @@ gradle版本问题(和spring-boot插件版本匹配)
 最终命令:./gradlew :gpt-app:bootJar
 待解决:自定义jar名称，指定jar的位置等
 
-运行命令
-nohup ~/java8/jdk1.8.0_202/bin/java -server -XX:-OmitStackTraceInFastThrow -XX:+UseG1GC  -jar gpt-app-1.0.jar > myout.file 2>&1 & 
+部署命令
+先把gradle进程关闭
+在运行
+nohup ~/java8/jdk1.8.0_202/bin/java -server -XX:-OmitStackTraceInFastThrow -XX:+UseG1GC  -Xms256m -Xmx256m -jar gpt-app-1.0.jar > myout.file 2>&1 &
+java -server -XX:-OmitStackTraceInFastThrow -XX:+UseG1GC -Xms256m -Xmx256m -jar gpt-app-1.0.jar 
 #-Xss512K
 
 
