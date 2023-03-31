@@ -1,12 +1,13 @@
-package com.xfd.weChat.service;
+package com.xfd.wChat.service;
 
 import com.google.gson.Gson;
-import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.api.WxConsts;
+import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.util.http.okhttp.DefaultOkHttpClientBuilder;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceOkHttpImpl;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
-import me.chanjar.weixin.mp.config.WxMpConfigStorage;
 import me.chanjar.weixin.mp.config.impl.WxMpMapConfigImpl;
 import me.chanjar.weixin.mp.util.xml.XStreamTransformer;
 import okhttp3.ConnectionPool;
@@ -20,17 +21,18 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 
 @Service
-//@EnableScheduling
-public class WeChatService {
+@EnableScheduling
+@Slf4j
+public class WChatService {
 
-    @Value("${weChat.appID}")
+    @Value("${wChat.appID}")
     private String appID;
-    @Value("${weChat.appSecret}")
+    @Value("${wChat.appSecret}")
     private String appSecret;
 
 
     @Bean
-    public WxMpService configWeChatService() {
+    public WxMpService configWChatService() {
         WxMpServiceOkHttpImpl wxMpServiceOkHttp = new WxMpServiceOkHttpImpl();
         wxMpServiceOkHttp.setMaxRetryTimes(1);
         WxMpMapConfigImpl wxMpConfigStorage = new WxMpMapConfigImpl();
@@ -50,8 +52,21 @@ public class WeChatService {
     public String getWxAccessToken() {
         try {
             return wxMpService.getAccessToken();
-        } catch (Exception e) {
-            return null;
+        } catch (WxErrorException e) {
+            try {
+                return wxMpService.getAccessToken(true);
+            } catch (WxErrorException gg) {
+                return null;
+            }
+        }
+    }
+
+    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.HOURS)
+    private void refreshWxAccessToken() {
+        try {
+            wxMpService.getAccessToken(true);
+        } catch (WxErrorException e) {
+            log.error("wx_access_token error", e);
         }
     }
 
@@ -68,12 +83,19 @@ public class WeChatService {
 
     public String processWXPushData(String xmlData) {
         WxMpXmlMessage wxMpXmlMessage = XStreamTransformer.fromXml(WxMpXmlMessage.class, xmlData);
+        WxMpXmlMessage returnMsg = new WxMpXmlMessage();
+        returnMsg.setFromUser("gh_ab5d4378c71d");
+        returnMsg.setToUser(wxMpXmlMessage.getToUser());
+        returnMsg.setContent(wxMpXmlMessage.getContent());
+        returnMsg.setCreateTime(System.currentTimeMillis());
+        returnMsg.setMsgType(WxConsts.XmlMsgType.TEXT);
+        String rtn = XStreamTransformer.toXml(WxMpXmlMessage.class, returnMsg);
         System.out.println(new Gson().toJson(wxMpXmlMessage));
-        return "";
+        return rtn;
     }
 
 //    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.HOURS)
-//    private void obtainWeChatAccessToken() {
+//    private void obtainwChatAccessToken() {
 //
 //    }
 

@@ -1,6 +1,6 @@
 package com.xfd;
 
-import com.xfd.weChat.service.WeChatService;
+import com.xfd.wChat.service.WChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.MessageDigest;
@@ -16,10 +15,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 @RestController
-public class WeChatConfigReceiver {
+public class WChatConfigReceiver {
 
     @Autowired
-    private WeChatService weChatService;
+    private WChatService wChatService;
 
     @RequestMapping(value = "/wx", method = RequestMethod.POST)
     ResponseEntity<String> wxDataReceiver(@RequestParam(required = false) String signature,
@@ -31,7 +30,7 @@ public class WeChatConfigReceiver {
         System.out.println(timestamp);
         System.out.println(nonce);
         System.out.println(echostr);
-        return ResponseEntity.ok(weChatService.processWXPushData(xmlData));
+        return ResponseEntity.ok(wChatService.processWXPushData(xmlData));
     }
 
     @RequestMapping(value = "/wx", method = RequestMethod.GET)

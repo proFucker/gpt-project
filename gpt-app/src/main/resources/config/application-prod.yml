@@ -1,6 +1,6 @@
 server:
   port: 80
 
-weChat:
+wChat:
   appID: wxc86fcb9788d36e3d
   appSecret: b8970404f64b91721c73a15387e81a33
