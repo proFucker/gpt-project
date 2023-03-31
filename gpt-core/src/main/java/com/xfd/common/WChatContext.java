@@ -7,8 +7,8 @@ import org.springframework.context.ApplicationContext;
 
 @Getter
 @Setter
-public class GPTContext {
-    private static ThreadLocal<GPTContext> contextHolder = new ThreadLocal<>();
+public class WChatContext {
+    private static ThreadLocal<WChatContext> contextHolder = new ThreadLocal<>();
 
     private String user;
     private Long userId;
@@ -21,15 +21,15 @@ public class GPTContext {
     //wx转发的消息
     private WxMpXmlMessage wxMpXmlMessage;
 
-    public static void setDesigned(GPTContext designed) {
+    public static void setDesigned(WChatContext designed) {
         contextHolder.set(designed);
     }
 
     public static void setNew() {
-        contextHolder.set(new GPTContext());
+        contextHolder.set(new WChatContext());
     }
 
-    public static GPTContext get() {
+    public static WChatContext get() {
         return contextHolder.get();
     }
 

@@ -2,7 +2,7 @@ package com.xfd.wChat.service;
 
 import com.google.common.cache.Cache;
 import com.xfd.openai.service.ChatStatus;
-import com.xfd.common.GPTContext;
+import com.xfd.common.WChatContext;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -94,8 +94,8 @@ public class WChatService {
 
     public String processWXPushData(String xmlData) {
         WxMpXmlMessage wxMpXmlMessage = XStreamTransformer.fromXml(WxMpXmlMessage.class, xmlData);
-        GPTContext.get().setWxMpXmlMessage(wxMpXmlMessage);
-        GPTContext.get().setUser(wxMpXmlMessage.getFromUser());
+        WChatContext.get().setWxMpXmlMessage(wxMpXmlMessage);
+        WChatContext.get().setUser(wxMpXmlMessage.getFromUser());
         WxMpXmlMessage returnMsg = null;
         switch (wxMpXmlMessage.getMsgType()) {
             case WxConsts.XmlMsgType.TEXT:
@@ -120,7 +120,7 @@ public class WChatService {
         WxMpXmlMessage rtn = null;
         switch (chatStatus) {
             case JUST_ENTER:
-                if (StringUtils.equals(GPTContext.getInputContent().trim(), "占卜")) {
+                if (StringUtils.equals(WChatContext.getInputContent().trim(), "占卜")) {
                     rtn = boxTextWxReturnMessage("知道辽,想预测哪方面的运势捏?\n事业\n爱情\n友情\n财运\n其他\n随便");
                     updateUserWChatStatus(ChatStatus.SELECTING_DESTINY);
                 } else {
@@ -130,7 +130,7 @@ public class WChatService {
                 }
                 break;
             case SELECTING_MENU:
-                if (StringUtils.equals(GPTContext.getInputContent().trim(), "占卜")) {
+                if (StringUtils.equals(WChatContext.getInputContent().trim(), "占卜")) {
                     rtn = boxTextWxReturnMessage("知道辽,想预测哪方面的运势捏?\n事业\n爱情\n友情\n财运\n其他\n随便");
                     updateUserWChatStatus(ChatStatus.SELECTING_DESTINY);
                 } else {
@@ -138,12 +138,12 @@ public class WChatService {
                 }
                 break;
             case SELECTING_DESTINY:
-                String destiny = GPTContext.getInputContent().trim();
+                String destiny = WChatContext.getInputContent().trim();
                 rtn = boxTextWxReturnMessage("好的,那能描述一下这方面的近况吗?");
                 updateUserWChatStatus(ChatStatus.DESCRIBING_SELF);
                 break;
             case DESCRIBING_SELF:
-                String describe = GPTContext.getInputContent().trim();
+                String describe = WChatContext.getInputContent().trim();
                 if (StringUtils.equals(describe, "没了")) {
                     rtn = boxTextWxReturnMessage("嗯嗯,想预测什么时期的运势呢?\n一周内\n一月内\n一年内\n随便预测");
                     updateUserWChatStatus(ChatStatus.SELECTING_TIME);
@@ -168,10 +168,10 @@ public class WChatService {
     }
 
     private WxMpXmlMessage boxTextWxReturnMessage(String content) {
-        GPTContext gptContext = GPTContext.get();
+        WChatContext WChatContext = WChatContext.get();
         WxMpXmlMessage returnMsg = new WxMpXmlMessage();
-        returnMsg.setFromUser(gptContext.getWitchWChatService());
-        returnMsg.setToUser(gptContext.getUser());
+        returnMsg.setFromUser(WChatContext.getWitchWChatService());
+        returnMsg.setToUser(WChatContext.getUser());
         returnMsg.setContent(content);
         returnMsg.setMsgType(WxConsts.XmlMsgType.TEXT);
         return returnMsg;
@@ -179,12 +179,12 @@ public class WChatService {
 
 
     private ChatStatus getUserWChatStatus() {
-        ChatStatus chatStatus = wChatCache.getIfPresent(GPTContext.getWChatUser());
+        ChatStatus chatStatus = wChatCache.getIfPresent(WChatContext.getWChatUser());
         return chatStatus == null ? ChatStatus.JUST_ENTER : chatStatus;
     }
 
     private void updateUserWChatStatus(ChatStatus status) {
-        wChatCache.put(GPTContext.getWChatUser(), status);
+        wChatCache.put(WChatContext.getWChatUser(), status);
     }
 
     private void predict() {

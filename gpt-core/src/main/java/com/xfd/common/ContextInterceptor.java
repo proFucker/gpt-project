@@ -26,9 +26,9 @@ public class ContextInterceptor implements HandlerInterceptor, ApplicationContex
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        GPTContext.setNew();
-        GPTContext.get().setApplicationContext(this.applicationContext);
-        GPTContext.get().setWitchWChatService(wChatServiceName);
+        WChatContext.setNew();
+        WChatContext.get().setApplicationContext(this.applicationContext);
+        WChatContext.get().setWitchWChatService(wChatServiceName);
         return true;
     }
 
@@ -38,6 +38,6 @@ public class ContextInterceptor implements HandlerInterceptor, ApplicationContex
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        GPTContext.clear();
+        WChatContext.clear();
     }
 }
