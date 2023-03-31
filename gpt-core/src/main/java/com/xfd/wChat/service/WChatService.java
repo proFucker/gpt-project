@@ -168,10 +168,10 @@ public class WChatService {
     }
 
     private WxMpXmlMessage boxTextWxReturnMessage(String content) {
-        WChatContext WChatContext = WChatContext.get();
+        WChatContext wChatContext = WChatContext.get();
         WxMpXmlMessage returnMsg = new WxMpXmlMessage();
-        returnMsg.setFromUser(WChatContext.getWitchWChatService());
-        returnMsg.setToUser(WChatContext.getUser());
+        returnMsg.setFromUser(wChatContext.getWitchWChatService());
+        returnMsg.setToUser(wChatContext.getUser());
         returnMsg.setContent(content);
         returnMsg.setMsgType(WxConsts.XmlMsgType.TEXT);
         return returnMsg;

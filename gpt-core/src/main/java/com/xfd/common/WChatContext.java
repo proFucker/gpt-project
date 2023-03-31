@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContext;
 
 @Getter
 @Setter
+@SuppressWarnings("unchecked")
 public class WChatContext {
     private static ThreadLocal<WChatContext> contextHolder = new ThreadLocal<>();
 
@@ -43,6 +44,10 @@ public class WChatContext {
 
     public static void clear() {
         contextHolder.remove();
+    }
+
+    public static <T> T getBean(String beanName) {
+        return (T) contextHolder.get().getApplicationContext().getBean(beanName);
     }
 
 }
