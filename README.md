@@ -12,7 +12,7 @@ gradle版本问题(和spring-boot插件版本匹配)
 部署命令
 先把gradle进程关闭
 在运行
-nohup ~/java8/jdk1.8.0_202/bin/java -server -XX:-OmitStackTraceInFastThrow -XX:+UseG1GC  -Xms128m -Xmx128m -jar ./gpt-app/build/libs/gpt-app-1.0.jar --spring.profiles.active=prod > myout.file 2>&1 &
+nohup ~/java8/jdk1.8.0_202/bin/java -server -XX:-OmitStackTraceInFastThrow -XX:+UseG1GC  -Xms128m -Xmx128m -jar gpt-app-1.0.jar --spring.profiles.active=prod > myout.file 2>&1 &
 java -server -XX:-OmitStackTraceInFastThrow -XX:+UseG1GC -Xms256m -Xmx256m -jar gpt-app-1.0.jar 
 #-Xss512K
 

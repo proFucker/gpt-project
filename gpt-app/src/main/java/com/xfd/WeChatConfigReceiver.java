@@ -27,6 +27,10 @@ public class WeChatConfigReceiver {
                                           @RequestParam(required = false) String nonce,
                                           @RequestParam(required = false) String echostr,
                                           @RequestBody String xmlData) {
+        System.out.println(signature);
+        System.out.println(timestamp);
+        System.out.println(nonce);
+        System.out.println(echostr);
         return ResponseEntity.ok(weChatService.processWXPushData(xmlData));
     }
 
