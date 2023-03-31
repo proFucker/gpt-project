@@ -86,7 +86,7 @@ public class WChatService {
         WxMpXmlMessage wxMpXmlMessage = XStreamTransformer.fromXml(WxMpXmlMessage.class, xmlData);
         WxMpXmlMessage returnMsg = new WxMpXmlMessage();
         returnMsg.setFromUser("gh_ab5d4378c71d");
-        returnMsg.setToUser(wxMpXmlMessage.getToUser());
+        returnMsg.setToUser(wxMpXmlMessage.getFromUser());
         returnMsg.setContent(wxMpXmlMessage.getContent());
         returnMsg.setCreateTime(System.currentTimeMillis());
         returnMsg.setMsgType(WxConsts.XmlMsgType.TEXT);
