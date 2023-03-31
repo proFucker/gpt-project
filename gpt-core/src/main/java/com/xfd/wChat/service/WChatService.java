@@ -82,6 +82,7 @@ public class WChatService {
 
 
     public String processWXPushData(String xmlData) {
+        System.out.println(xmlData);
         WxMpXmlMessage wxMpXmlMessage = XStreamTransformer.fromXml(WxMpXmlMessage.class, xmlData);
         WxMpXmlMessage returnMsg = new WxMpXmlMessage();
         returnMsg.setFromUser("gh_ab5d4378c71d");
@@ -90,7 +91,8 @@ public class WChatService {
         returnMsg.setCreateTime(System.currentTimeMillis());
         returnMsg.setMsgType(WxConsts.XmlMsgType.TEXT);
         String rtn = XStreamTransformer.toXml(WxMpXmlMessage.class, returnMsg);
-        System.out.println(new Gson().toJson(wxMpXmlMessage));
+        System.out.println(rtn);
+//        System.out.println(new Gson().toJson(wxMpXmlMessage));
         return rtn;
     }
 
