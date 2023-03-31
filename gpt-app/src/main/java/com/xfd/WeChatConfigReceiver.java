@@ -1,13 +1,14 @@
 package com.xfd;
 
-import com.xfd.entity.UserDescribe;
+import com.xfd.weChat.service.WeChatService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.MessageDigest;
@@ -15,19 +16,30 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 @RestController
-public class WChatReceiver {
+public class WeChatConfigReceiver {
+
+    @Autowired
+    private WeChatService weChatService;
+
+    @RequestMapping(value = "/wx", method = RequestMethod.POST)
+    ResponseEntity<String> wxDataReceiver(@RequestParam(required = false) String signature,
+                                          @RequestParam(required = false) String timestamp,
+                                          @RequestParam(required = false) String nonce,
+                                          @RequestParam(required = false) String echostr,
+                                          @RequestBody String xmlData) {
+        return ResponseEntity.ok(weChatService.processWXPushData(xmlData));
+    }
 
     @RequestMapping(value = "/wx", method = RequestMethod.GET)
-    ResponseEntity<String> userBaseDescribe(@RequestParam String signature,
-                                            @RequestParam String timestamp,
-                                            @RequestParam String nonce,
-                                            @RequestParam String echostr) {
+    ResponseEntity<String> serviceConfirm(@RequestParam String signature,
+                                          @RequestParam String timestamp,
+                                          @RequestParam String nonce,
+                                          @RequestParam String echostr) {
         if (checkSignature(signature, timestamp, nonce)) {
             return ResponseEntity.ok(echostr);
         } else {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
-
     }
 
     public static boolean checkSignature(String signature, String timestamp, String nonce) {

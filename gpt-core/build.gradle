@@ -6,16 +6,19 @@ group 'org.example'
 version '1.0-SNAPSHOT'
 
 repositories {
+    maven { url 'https://maven.aliyun.com/repository/public' }
     mavenCentral()
 }
 
 dependencies {
     implementation 'org.projectlombok:lombok:1.18.16'
+    annotationProcessor 'org.projectlombok:lombok:1.18.16'
     implementation 'com.theokanning.openai-gpt3-java:service:0.11.1'
     implementation 'com.theokanning.openai-gpt3-java:client:0.11.1'
     implementation 'com.theokanning.openai-gpt3-java:api:0.11.1'
     implementation 'com.google.guava:guava:31.1-jre'
     implementation 'org.springframework:spring-context:5.3.16'
     implementation 'com.github.binarywang:weixin-java-mp:4.4.9.B'
+//    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.5'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 }

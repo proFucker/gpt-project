@@ -1,4 +1,4 @@
-package com.xfd.service;
+package com.xfd.openai.service;
 
 import com.google.common.collect.Lists;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -6,8 +6,7 @@ import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.service.OpenAiService;
-import com.xfd.entity.UserDescribe;
-import org.springframework.stereotype.Service;
+import com.xfd.openai.entity.UserDescribe;
 
 import java.time.Duration;
 

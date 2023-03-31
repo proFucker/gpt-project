@@ -1,4 +1,4 @@
-package com.xfd.entity;
+package com.xfd.openai.entity;
 
 import lombok.Getter;
 import lombok.Setter;

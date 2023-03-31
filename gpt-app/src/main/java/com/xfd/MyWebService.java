@@ -1,7 +1,7 @@
 package com.xfd;
 
-import com.xfd.entity.UserDescribe;
-import com.xfd.service.GPTService;
+import com.xfd.openai.entity.UserDescribe;
+import com.xfd.weChat.service.WeChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 public class MyWebService {
+
 
     @RequestMapping(value = "/baseInfo", method = RequestMethod.POST)
     ResponseEntity<String> userBaseDescribe(@RequestBody UserDescribe userDescribe) {
@@ -26,6 +28,7 @@ public class MyWebService {
 //        return ResponseEntity.ok(gptResponse);
 //    }
 
+
     @RequestMapping(value = "/test1", method = RequestMethod.GET)
     ResponseEntity<String> test1(@RequestParam String key) {
         return ResponseEntity.ok(key);
@@ -36,5 +39,10 @@ public class MyWebService {
         return ResponseEntity.ok("hello_world");
     }
 
+    @RequestMapping(value = "/hello", method = RequestMethod.POST)
+    ResponseEntity<String> test2(@RequestParam(required = false) String shit) {
+        System.out.println(shit);
+        return ResponseEntity.ok("hello_world_post");
+    }
 
 }
