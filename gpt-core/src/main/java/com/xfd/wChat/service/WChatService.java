@@ -1,6 +1,8 @@
 package com.xfd.wChat.service;
 
-import com.google.gson.Gson;
+import com.google.common.cache.Cache;
+import com.xfd.openai.service.ChatStatus;
+import com.xfd.common.GPTContext;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -11,7 +13,9 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.config.impl.WxMpMapConfigImpl;
 import me.chanjar.weixin.mp.util.xml.XStreamTransformer;
 import okhttp3.ConnectionPool;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -49,6 +53,14 @@ public class WChatService {
     @Autowired
     private WxMpService wxMpService;
 
+    @Autowired
+    @Qualifier("wChat_status_cache")
+    private Cache<String, ChatStatus> wChatCache;
+
+    @Autowired
+    @Qualifier("wChat_data")
+    private Cache<String, Object> wChatDataCache;
+
     public String getWxAccessToken() {
         try {
             return wxMpService.getAccessToken();
@@ -80,20 +92,104 @@ public class WChatService {
 
     }
 
-
     public String processWXPushData(String xmlData) {
-        System.out.println(xmlData);
         WxMpXmlMessage wxMpXmlMessage = XStreamTransformer.fromXml(WxMpXmlMessage.class, xmlData);
-        WxMpXmlMessage returnMsg = new WxMpXmlMessage();
-        returnMsg.setFromUser("gh_ab5d4378c71d");
-        returnMsg.setToUser(wxMpXmlMessage.getFromUser());
-        returnMsg.setContent(wxMpXmlMessage.getContent());
-        returnMsg.setCreateTime(System.currentTimeMillis());
-        returnMsg.setMsgType(WxConsts.XmlMsgType.TEXT);
-        String rtn = XStreamTransformer.toXml(WxMpXmlMessage.class, returnMsg);
-        System.out.println(rtn);
-//        System.out.println(new Gson().toJson(wxMpXmlMessage));
+        GPTContext.get().setWxMpXmlMessage(wxMpXmlMessage);
+        GPTContext.get().setUser(wxMpXmlMessage.getFromUser());
+        WxMpXmlMessage returnMsg = null;
+        switch (wxMpXmlMessage.getMsgType()) {
+            case WxConsts.XmlMsgType.TEXT:
+                returnMsg = processTextMsg();
+                break;
+            case WxConsts.XmlMsgType.IMAGE:
+                returnMsg = boxTextWxReturnMessage("这图好好看");
+                break;
+            case WxConsts.XmlMsgType.VOICE:
+                returnMsg = boxTextWxReturnMessage("小优听不懂,只看得懂文字哦");
+                break;
+            default:
+                returnMsg = boxTextWxReturnMessage("小优还不够智能,请再次输入");
+                break;
+        }
+        return XStreamTransformer.toXml(WxMpXmlMessage.class, returnMsg);
+
+    }
+
+    private WxMpXmlMessage processTextMsg() {
+        ChatStatus chatStatus = getUserWChatStatus();
+        WxMpXmlMessage rtn = null;
+        switch (chatStatus) {
+            case JUST_ENTER:
+                if (StringUtils.equals(GPTContext.getInputContent().trim(), "占卜")) {
+                    rtn = boxTextWxReturnMessage("知道辽,想预测哪方面的运势捏?\n事业\n爱情\n友情\n财运\n其他\n随便");
+                    updateUserWChatStatus(ChatStatus.SELECTING_DESTINY);
+                } else {
+                    rtn = boxTextWxReturnMessage("这里是小优,有什么可以帮您?\n" +
+                        "预测运势请输入\"占卜\"");
+                    updateUserWChatStatus(ChatStatus.SELECTING_MENU);
+                }
+                break;
+            case SELECTING_MENU:
+                if (StringUtils.equals(GPTContext.getInputContent().trim(), "占卜")) {
+                    rtn = boxTextWxReturnMessage("知道辽,想预测哪方面的运势捏?\n事业\n爱情\n友情\n财运\n其他\n随便");
+                    updateUserWChatStatus(ChatStatus.SELECTING_DESTINY);
+                } else {
+                    rtn = boxTextWxReturnMessage("小优好笨,没看懂,能重新说说吗");
+                }
+                break;
+            case SELECTING_DESTINY:
+                String destiny = GPTContext.getInputContent().trim();
+                rtn = boxTextWxReturnMessage("好的,那能描述一下这方面的近况吗?");
+                updateUserWChatStatus(ChatStatus.DESCRIBING_SELF);
+                break;
+            case DESCRIBING_SELF:
+                String describe = GPTContext.getInputContent().trim();
+                if (StringUtils.equals(describe, "没了")) {
+                    rtn = boxTextWxReturnMessage("嗯嗯,想预测什么时期的运势呢?\n一周内\n一月内\n一年内\n随便预测");
+                    updateUserWChatStatus(ChatStatus.SELECTING_TIME);
+                } else {
+                    rtn = boxTextWxReturnMessage("嗯嗯,小优在听,还有吗?");
+                }
+                break;
+            case SELECTING_TIME:
+                rtn = boxTextWxReturnMessage("知道辽,想要测得准,能提供一下一些个人信息吗,我问你答\n可以\n算了吧");
+                updateUserWChatStatus(ChatStatus.REPLENISH_SELF_DETAIL);
+                break;
+            case REPLENISH_SELF_DETAIL:
+                updateUserWChatStatus(ChatStatus.PREDICTING);
+                predict();
+                break;
+            case PREDICTING:
+                rtn = boxTextWxReturnMessage("小优还在施法中,请耐心等一等哦");
+                break;
+
+        }
         return rtn;
+    }
+
+    private WxMpXmlMessage boxTextWxReturnMessage(String content) {
+        GPTContext gptContext = GPTContext.get();
+        WxMpXmlMessage returnMsg = new WxMpXmlMessage();
+        returnMsg.setFromUser(gptContext.getWitchWChatService());
+        returnMsg.setToUser(gptContext.getUser());
+        returnMsg.setContent(content);
+        returnMsg.setMsgType(WxConsts.XmlMsgType.TEXT);
+        return returnMsg;
+    }
+
+
+    private ChatStatus getUserWChatStatus() {
+        ChatStatus chatStatus = wChatCache.getIfPresent(GPTContext.getWChatUser());
+        return chatStatus == null ? ChatStatus.JUST_ENTER : chatStatus;
+    }
+
+    private void updateUserWChatStatus(ChatStatus status) {
+        wChatCache.put(GPTContext.getWChatUser(), status);
+    }
+
+    private void predict() {
+        //mock
+
     }
 
 //    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.HOURS)

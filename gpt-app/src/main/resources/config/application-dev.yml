@@ -4,3 +4,5 @@ server:
 wChat:
   appID: wxc86fcb9788d36e3d
   appSecret: b8970404f64b91721c73a15387e81a33
+  gzhName: gh_ab5d4378c71d
+  token: shit

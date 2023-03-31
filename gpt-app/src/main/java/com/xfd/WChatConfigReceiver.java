@@ -2,6 +2,10 @@ package com.xfd;
 
 import com.xfd.wChat.service.WChatService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,16 +24,17 @@ public class WChatConfigReceiver {
     @Autowired
     private WChatService wChatService;
 
+    @Autowired
+    private Environment environment;
+
+    @Value("${wChat.token}")
+    private String token;
+
     @RequestMapping(value = "/wx", method = RequestMethod.POST)
     ResponseEntity<String> wxDataReceiver(@RequestParam(required = false) String signature,
                                           @RequestParam(required = false) String timestamp,
                                           @RequestParam(required = false) String nonce,
-                                          @RequestParam(required = false) String echostr,
                                           @RequestBody String xmlData) {
-        System.out.println(signature);
-        System.out.println(timestamp);
-        System.out.println(nonce);
-        System.out.println(echostr);
         return ResponseEntity.ok(wChatService.processWXPushData(xmlData));
     }
 
@@ -38,18 +43,18 @@ public class WChatConfigReceiver {
                                           @RequestParam String timestamp,
                                           @RequestParam String nonce,
                                           @RequestParam String echostr) {
-        if (checkSignature(signature, timestamp, nonce)) {
+        if (checkSignature(signature, timestamp, nonce, token)) {
             return ResponseEntity.ok(echostr);
         } else {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
     }
 
-    public static boolean checkSignature(String signature, String timestamp, String nonce) {
+    public boolean checkSignature(String signature, String timestamp, String nonce, String token) {
         String checktext = null;
         if (null != signature) {
             //对ToKen,timestamp,nonce 按字典排序
-            String[] paramArr = new String[]{"shit", timestamp, nonce};
+            String[] paramArr = new String[]{token, timestamp, nonce};
             Arrays.sort(paramArr);
             //将排序后的结果拼成一个字符串
             String content = paramArr[0].concat(paramArr[1]).concat(paramArr[2]);
@@ -67,13 +72,7 @@ public class WChatConfigReceiver {
         return checktext != null ? checktext.equals(signature.toUpperCase()) : false;
     }
 
-    /**
-     * 将字节数组转化我16进制字符串
-     *
-     * @param byteArrays 字符数组
-     * @return 字符串
-     */
-    private static String byteToStr(byte[] byteArrays) {
+    private String byteToStr(byte[] byteArrays) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < byteArrays.length; i++) {
             sb.append(byteToHexStr(byteArrays[i]));
@@ -81,13 +80,7 @@ public class WChatConfigReceiver {
         return sb.toString();
     }
 
-    /**
-     * 将字节转化为十六进制字符串
-     *
-     * @param myByte 字节
-     * @return 字符串
-     */
-    private static String byteToHexStr(byte myByte) {
+    private String byteToHexStr(byte myByte) {
         char[] Digit = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
         char[] tampArr = new char[2];
         tampArr[0] = Digit[(myByte >>> 4) & 0X0F];

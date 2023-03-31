@@ -16,5 +16,8 @@ nohup ~/java8/jdk1.8.0_202/bin/java -server -XX:-OmitStackTraceInFastThrow -XX:+
 java -server -XX:-OmitStackTraceInFastThrow -XX:+UseG1GC -Xms256m -Xmx256m -jar gpt-app-1.0.jar 
 #-Xss512K
 
+公众号流程设计:
+
+
 
 
