@@ -19,6 +19,28 @@ repositories {
     mavenCentral()
 }
 
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["../gpt-core/src/main/resources", "./src/main/resources"]
+
+        }
+    }
+}
+//sourceSets {
+//    main {
+//        resources {
+//            srcDirs = ["src/main/resources/$env", "./config", "src/main/resources/base", "src/main/webapp"]
+//        }
+//    }
+//    test {
+//        resources {
+//            srcDirs = ["src/test/resources/$env", "./config", "src/test/resources/base"]
+//        }
+//    }
+//}
+
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.5.10'

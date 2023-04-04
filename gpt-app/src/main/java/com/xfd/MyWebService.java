@@ -1,6 +1,9 @@
 package com.xfd;
 
 import com.xfd.openai.entity.UserDescribe;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,8 +12,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class MyWebService {
+public class MyWebService implements ApplicationContextAware {
 
+    private ApplicationContext applicationContext;
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     @RequestMapping(value = "/baseInfo", method = RequestMethod.POST)
     ResponseEntity<String> userBaseDescribe(@RequestBody UserDescribe userDescribe) {

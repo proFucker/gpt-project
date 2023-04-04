@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -35,8 +36,25 @@ public class WChatService {
     private String appSecret;
 
 
-    @Bean
-    public WxMpService configWChatService() {
+//    @Bean
+//    public WxMpService configWChatService() {
+//        WxMpServiceOkHttpImpl wxMpServiceOkHttp = new WxMpServiceOkHttpImpl();
+//        wxMpServiceOkHttp.setMaxRetryTimes(1);
+//        WxMpMapConfigImpl wxMpConfigStorage = new WxMpMapConfigImpl();
+//        wxMpConfigStorage.setMaxRetryTimes(1);
+//        wxMpConfigStorage.setAppId(appID);
+//        wxMpConfigStorage.setSecret(appSecret);
+//        configOkHttpClient();
+////        wxMpConfigStorage.setHttpProxyHost();
+//        wxMpServiceOkHttp.setWxMpConfigStorage(wxMpConfigStorage);
+//        wxMpServiceOkHttp.initHttp();
+//        return wxMpServiceOkHttp;
+//    }
+
+    private WxMpService wxMpService;
+
+    @PostConstruct
+    private void initInnerService() {
         WxMpServiceOkHttpImpl wxMpServiceOkHttp = new WxMpServiceOkHttpImpl();
         wxMpServiceOkHttp.setMaxRetryTimes(1);
         WxMpMapConfigImpl wxMpConfigStorage = new WxMpMapConfigImpl();
@@ -47,11 +65,9 @@ public class WChatService {
 //        wxMpConfigStorage.setHttpProxyHost();
         wxMpServiceOkHttp.setWxMpConfigStorage(wxMpConfigStorage);
         wxMpServiceOkHttp.initHttp();
-        return wxMpServiceOkHttp;
+        wxMpService = wxMpServiceOkHttp;
     }
 
-    @Autowired
-    private WxMpService wxMpService;
 
     @Autowired
     @Qualifier("wChat_status_cache")
