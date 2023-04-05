@@ -1,0 +1,9 @@
+# mybatis配置
+mybatis:
+  check-config-location: true
+  #  mybatis框架配置文件，对mybatis的生命周期起作用
+  config-location: "classpath:config/mybatis-config.xml"
+  #  配置xml路径
+  mapper-locations: "classpath:config/mapper/*Mapper.xml"
+  #  配置model包路径
+  type-aliases-package: "com.xfd.common.dao"

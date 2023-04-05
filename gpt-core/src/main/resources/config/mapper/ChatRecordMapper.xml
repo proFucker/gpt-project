@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xfd.common.mapper.ChatRecordMapper">
+    <!--
+        这里是不能使用#{} 否则会以字符串形式放在Sql语句当中 只能使用${}
+        #{}是防止Sql注入风险的 是以值的方式放到Sql语句当中
+        如果需要的Sql语句的关键字(固定值)放到Sql语句当中只能使用${}
+    -->
+    <select id="selectCurrentChat" resultType="ChatRecord">
+        SELECT
+            `role`
+            ,`content`
+        FROM
+            `chat_record`
+        WHERE `user_id`=#{wxId} AND `context_key`=#{contextKey}
+        ORDER BY `id`
+    </select>
+
+    <insert id="batchSaveChatRecord">
+        INSERT INTO `chat_record`(`user_id`,`role`, `content`,`context_key`) VALUES
+        <foreach collection="list" separator="," item="item">
+            (#{item.userId},#{item.role},#{item.context},#{item.context_key})
+        </foreach>
+    </insert>
+
+</mapper>
