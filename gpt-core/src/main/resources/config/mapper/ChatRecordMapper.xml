@@ -7,20 +7,32 @@
         #{}是防止Sql注入风险的 是以值的方式放到Sql语句当中
         如果需要的Sql语句的关键字(固定值)放到Sql语句当中只能使用${}
     -->
+<!--    <resultMap id="ChatRecord" type="C">-->
+<!--        &lt;!&ndash; property: 实体类属性名.-->
+<!--             column: 库中表的列名-->
+<!--            javaType: 数据类型.-->
+<!--        &ndash;&gt;-->
+<!--        <id property="deptno" column="deptno" javaType="long"></id>-->
+<!--        <result property="dname" column="dname"></result>-->
+<!--        <result property="dbSource" column="db_source"></result>-->
+<!--    </resultMap>-->
+
     <select id="selectCurrentChat" resultType="ChatRecord">
         SELECT
             `role`
             ,`content`
+<!--            ,`user_id` as `userId`-->
+<!--            ,`context_key` as `contextKey`-->
         FROM
             `chat_record`
-        WHERE `user_id`=#{wxId} AND `context_key`=#{contextKey}
+        WHERE `user_id`=#{userId} AND `context_key`=#{contextKey}
         ORDER BY `id`
     </select>
 
     <insert id="batchSaveChatRecord">
         INSERT INTO `chat_record`(`user_id`,`role`, `content`,`context_key`) VALUES
         <foreach collection="list" separator="," item="item">
-            (#{item.userId},#{item.role},#{item.context},#{item.context_key})
+            (#{item.userId},#{item.role},#{item.content},#{item.contextKey})
         </foreach>
     </insert>
 
