@@ -1,7 +1,10 @@
 package com.xfd.wChat.service;
 
 import com.google.common.cache.Cache;
-import com.xfd.openai.service.ChatStatus;
+import com.google.common.collect.Sets;
+import com.xfd.common.dao.UserCommonInfo;
+import com.xfd.common.mapper.UserCommonInfoMapper;
+import com.xfd.wChat.practise.ChatStatus;
 import com.xfd.common.WChatContext;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
@@ -17,12 +20,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -34,22 +37,6 @@ public class WChatService {
     private String appID;
     @Value("${wChat.appSecret}")
     private String appSecret;
-
-
-//    @Bean
-//    public WxMpService configWChatService() {
-//        WxMpServiceOkHttpImpl wxMpServiceOkHttp = new WxMpServiceOkHttpImpl();
-//        wxMpServiceOkHttp.setMaxRetryTimes(1);
-//        WxMpMapConfigImpl wxMpConfigStorage = new WxMpMapConfigImpl();
-//        wxMpConfigStorage.setMaxRetryTimes(1);
-//        wxMpConfigStorage.setAppId(appID);
-//        wxMpConfigStorage.setSecret(appSecret);
-//        configOkHttpClient();
-////        wxMpConfigStorage.setHttpProxyHost();
-//        wxMpServiceOkHttp.setWxMpConfigStorage(wxMpConfigStorage);
-//        wxMpServiceOkHttp.initHttp();
-//        return wxMpServiceOkHttp;
-//    }
 
     private WxMpService wxMpService;
 
@@ -110,6 +97,7 @@ public class WChatService {
 
     public String processWXPushData(String xmlData) {
         WxMpXmlMessage wxMpXmlMessage = XStreamTransformer.fromXml(WxMpXmlMessage.class, xmlData);
+        wxMpXmlMessage.setContent(wxMpXmlMessage.getContent().trim());
         WChatContext.get().setWxMpXmlMessage(wxMpXmlMessage);
         WChatContext.get().setUser(wxMpXmlMessage.getFromUser());
         WxMpXmlMessage returnMsg = null;
@@ -128,60 +116,171 @@ public class WChatService {
                 break;
         }
         return XStreamTransformer.toXml(WxMpXmlMessage.class, returnMsg);
-
     }
 
     private WxMpXmlMessage processTextMsg() {
         ChatStatus chatStatus = getUserWChatStatus();
-        WxMpXmlMessage rtn = null;
+        WxMpXmlMessage answer = new WxMpXmlMessage();
+        UserCommonInfo userCommonInfo = null;
         switch (chatStatus) {
             case JUST_ENTER:
-                if (StringUtils.equals(WChatContext.getInputContent().trim(), "占卜")) {
-                    rtn = boxTextWxReturnMessage("知道辽,想预测哪方面的运势捏?\n事业\n爱情\n友情\n财运\n其他\n随便");
+                if (StringUtils.equals(WChatContext.getInputContent(), "运势")) {
+                    answer.setContent("小优明白了,你想预测哪方面的运势捏?\n1,事业\n2,爱情\n3,友情\n4,财运\n5,其他\n6,随便\n请输入前面的数字");
                     updateUserWChatStatus(ChatStatus.SELECTING_DESTINY);
                 } else {
-                    rtn = boxTextWxReturnMessage("这里是小优,有什么可以帮您?\n" +
-                        "预测运势请输入\"占卜\"");
+                    answer.setContent("这里是小优,有什么可以帮您?\n" +
+                        "预测运势请输入\"1,运势\"\n" +
+                        "查看旅游攻略请输入\"2,旅游\"\n请输入前面的数字");
                     updateUserWChatStatus(ChatStatus.SELECTING_MENU);
                 }
                 break;
             case SELECTING_MENU:
-                if (StringUtils.equals(WChatContext.getInputContent().trim(), "占卜")) {
-                    rtn = boxTextWxReturnMessage("知道辽,想预测哪方面的运势捏?\n事业\n爱情\n友情\n财运\n其他\n随便");
+                if (StringUtils.equals(WChatContext.getInputContent(), "1") ||
+                    StringUtils.equals(WChatContext.getInputContent(), "运势")) {
+                    answer.setContent("小优明白了,你想预测哪方面的运势捏?\n1,事业\n2,爱情\n3,友情\n4,财运\n5,其他\n6,随便\n请输入前面的数字");
                     updateUserWChatStatus(ChatStatus.SELECTING_DESTINY);
                 } else {
-                    rtn = boxTextWxReturnMessage("小优好笨,没看懂,能重新说说吗");
+                    answer.setContent("存在于虚空的选项呢,请重新选择...");
                 }
                 break;
             case SELECTING_DESTINY:
-                String destiny = WChatContext.getInputContent().trim();
-                rtn = boxTextWxReturnMessage("好的,那能描述一下这方面的近况吗?");
-                updateUserWChatStatus(ChatStatus.DESCRIBING_SELF);
-                break;
-            case DESCRIBING_SELF:
-                String describe = WChatContext.getInputContent().trim();
-                if (StringUtils.equals(describe, "没了")) {
-                    rtn = boxTextWxReturnMessage("嗯嗯,想预测什么时期的运势呢?\n一周内\n一月内\n一年内\n随便预测");
-                    updateUserWChatStatus(ChatStatus.SELECTING_TIME);
-                } else {
-                    rtn = boxTextWxReturnMessage("嗯嗯,小优在听,还有吗?");
+                switch (WChatContext.getInputContent()) {
+                    case "1":
+                    case "事业":
+                        wChatDataCache.put("practice_destiny", "事业");
+                        answer.setContent("好的,那能描述一下这方面的近况吗?如果不想请输入\"没了\"");
+                        break;
+                    case "2":
+                    case "爱情":
+                        wChatDataCache.put("practice_destiny", "爱情");
+                        answer.setContent("好的,那能描述一下这方面的近况吗?如果不想请输入\"没了\"");
+                        break;
+                    case "3":
+                    case "友情":
+                        wChatDataCache.put("practice_destiny", "友情");
+                        answer.setContent("好的,那能描述一下这方面的近况吗?如果不想请输入\"没了\"");
+                        break;
+                    case "4":
+                    case "财运":
+                        wChatDataCache.put("practice_destiny", "财运");
+                        answer.setContent("好的,那能描述一下这方面的近况吗?如果不想请输入\"没了\"");
+                        break;
+                    case "5":
+                    case "其他":
+                    case "6":
+                    case "随便":
+                        answer.setContent("好的,那能描述一下这方面的近况吗?如果不想请输入\"没了\"");
+                        break;
+                    default:
+                        answer.setContent("存在于虚空的选项呢,请重新选择...");
+                        break;
                 }
                 break;
-            case SELECTING_TIME:
-                rtn = boxTextWxReturnMessage("知道辽,想要测得准,能提供一下一些个人信息吗,我问你答\n可以\n算了吧");
-                updateUserWChatStatus(ChatStatus.REPLENISH_SELF_DETAIL);
+            case DESCRIBING_SELF:
+                String describe = WChatContext.getInputContent();
+                if (StringUtils.equals(describe, "没了")) {
+                    answer.setContent("嗯嗯,想预测什么时期的运势呢?\n1,一周内\n2,一月内\n3,一年内\n4,随便预测");
+                    updateUserWChatStatus(ChatStatus.SELECTING_PRACTISE_TIME);
+                } else {
+                    String cacheDescribe = (String) wChatDataCache.getIfPresent("practice_recent_info");
+                    if (cacheDescribe == null) {
+                        wChatDataCache.put("practice_recent_info", describe);
+                    } else {
+                        wChatDataCache.put("practice_recent_info", cacheDescribe + "," + describe);
+                    }
+                    answer.setContent("嗯嗯,小优在听,还有吗?没有请输入\"没了\"");
+                }
+                break;
+            case SELECTING_PRACTISE_TIME:
+
+                switch (WChatContext.getInputContent()) {
+                    case "1":
+                    case "一周内":
+                        wChatDataCache.put("practice_time", "一周内");
+//                        userCommonInfo = userCommonInfoMapper.selectUserCommonInfoByUserId(WChatContext.getWChatUser());
+//                        if (userCommonInfo == null) {
+//                        userCommonInfoMapper.insertNewUserCommonInfo(WChatContext.getWChatUser(), System.currentTimeMillis());
+                        answer.setContent("知道辽,想要测得准,能提供一下一些个人信息吗,能让预测更加准确,我问你答。\n1,可以\n2,算了吧");
+//                        } else {
+//                            if(StringUtils.isBlank(userCommonInfo.getBirthday())
+//                        }
+                        updateUserWChatStatus(ChatStatus.REPLENISH_SELF_DETAIL);
+                        break;
+                    case "2":
+                    case "一月内":
+                        wChatDataCache.put("practice_time", "一月内");
+//                        userCommonInfo = userCommonInfoMapper.selectUserCommonInfoByUserId(WChatContext.getWChatUser());
+                        answer.setContent("知道辽,想要测得准,能提供一下一些个人信息吗,能让预测更加准确,我问你答。\n1,可以\n2,算了吧");
+                        updateUserWChatStatus(ChatStatus.REPLENISH_SELF_DETAIL);
+                        break;
+                    case "3":
+                    case "一年内":
+                        wChatDataCache.put("practice_time", "一年内");
+//                        userCommonInfo = userCommonInfoMapper.selectUserCommonInfoByUserId(WChatContext.getWChatUser());
+                        answer.setContent("知道辽,想要测得准,能提供一下一些个人信息吗,能让预测更加准确,我问你答。\n1,可以\n2,算了吧");
+                        updateUserWChatStatus(ChatStatus.REPLENISH_SELF_DETAIL);
+                        break;
+                    case "4":
+                    case "随便预测":
+                        answer.setContent("知道辽,想要测得准,能提供一下一些个人信息吗,能让预测更加准确,我问你答。\n1,可以\n2,算了吧");
+                        updateUserWChatStatus(ChatStatus.REPLENISH_SELF_DETAIL);
+                        break;
+                    default:
+                        answer.setContent("存在于虚空的选项呢,请重新选择...");
+                        break;
+                }
                 break;
             case REPLENISH_SELF_DETAIL:
-                updateUserWChatStatus(ChatStatus.PREDICTING);
-                predict();
+                Integer detailStep = (Integer) wChatDataCache.getIfPresent("REPLENISH_SELF_DETAIL_STEP");
+                if (detailStep != null) {
+                    switch (detailStep) {
+                        case 1:
+                            ((UserCommonInfo) wChatDataCache.getIfPresent("REPLENISH_SELF_DETAIL")).setName(WChatContext.getInputContent());
+                            wChatDataCache.put("REPLENISH_SELF_DETAIL_STEP", 2);
+                            answer.setContent("您的生日是?");
+                            break;
+                        case 2:
+                            ((UserCommonInfo) wChatDataCache.getIfPresent("REPLENISH_SELF_DETAIL")).setBirthday(WChatContext.getInputContent());
+                            wChatDataCache.put("REPLENISH_SELF_DETAIL_STEP", 3);
+                            updateUserWChatStatus(ChatStatus.PREDICTING);
+                            answer.setContent("小优开始施法了,请耐心等一下");
+                            predict();
+                            break;
+                    }
+                } else {
+                    switch (WChatContext.getInputContent()) {
+                        case "1":
+                        case "可以":
+                            wChatDataCache.put("REPLENISH_SELF_DETAIL", new UserCommonInfo());
+                            wChatDataCache.put("REPLENISH_SELF_DETAIL_STEP", 1);
+                            answer.setContent("您的名字是?(真名或者昵称)");
+                            break;
+                        case "2":
+                        case "算了吧":
+                            updateUserWChatStatus(ChatStatus.PREDICTING);
+                            answer.setContent("小优开始施法了,请耐心等一下");
+                            predict();
+                            break;
+                        default:
+                            answer.setContent("存在于虚空的选项呢,请重新选择...");
+                            break;
+                    }
+                }
                 break;
             case PREDICTING:
-                rtn = boxTextWxReturnMessage("小优还在施法中,请耐心等一等哦");
+                answer.setContent("小优还在施法中,请耐心等一等哦");
                 break;
 
         }
-        return rtn;
+        return answer;
     }
+
+
+    @Autowired
+    UserCommonInfoMapper userCommonInfoMapper;
+
+    private static Set<String> validDestinySelect = Sets.newHashSet("1", "2", "3", "4", "5", "6",
+        "事业", "爱情", "友情", "财运", "其他", "随便");
 
     private WxMpXmlMessage boxTextWxReturnMessage(String content) {
         WChatContext wChatContext = WChatContext.get();

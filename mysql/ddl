@@ -1,0 +1,24 @@
+CREATE TABLE `chat_record` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` CHAR(40) NOT NULL,
+  `content` TEXT NOT NULL,
+  `context_key` CHAR(40) DEFAULT NULL,
+  `role` CHAR(1) NOT NULL
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+CREATE INDEX `context_key_index` ON `chat_record` (context_key(10))
+CREATE INDEX `user_id_index` ON `chat_record` (user_id(10))
+
+CREATE TABLE `user_common_info` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` CHAR(40) NOT NULL,
+  `update_time` bigint NOT NULL,
+  `name` CHAR(20) DEFAULT NULL,
+  `birthday` CHAR(20) DEFAULT NULL,
+  `job` CHAR(20) DEFAULT NULL,
+  `height_and_weight` CHAR(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+CREATE INDEX `user_id_index` ON `user_common_info` (user_id(10))

@@ -2,7 +2,7 @@ package com.xfd.common;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.xfd.openai.service.ChatStatus;
+import com.xfd.wChat.practise.ChatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
