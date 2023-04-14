@@ -274,6 +274,7 @@ public class WChatService {
         }
 
         boxTextWxMsg(answer);
+        answer.setContent("test");
         return answer;
     }
 

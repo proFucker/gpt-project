@@ -3,7 +3,7 @@ appProcessId=`ps -ef | grep java | grep "gpt-app" | awk 'BEGIN{FS=" "}{print $2}
 echo $appProcessId
 
 if  [ x"$appProcessId" != "" ];then
-  kill $$appProcessId
+  kill $appProcessId
 fi
 
 projectHead=$1
