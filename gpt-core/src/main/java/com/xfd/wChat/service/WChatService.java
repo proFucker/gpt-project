@@ -93,6 +93,7 @@ public class WChatService {
     }
 
     public String processWXPushData(String xmlData) {
+        log.warn("wx_in_meg = {}", xmlData);
         WxMpXmlMessage wxMpXmlMessage = XStreamTransformer.fromXml(WxMpXmlMessage.class, xmlData);
         wxMpXmlMessage.setContent(wxMpXmlMessage.getContent().trim());
         WChatContext.get().setWxMpXmlMessage(wxMpXmlMessage);
@@ -112,7 +113,9 @@ public class WChatService {
                 returnMsg = boxTextWxReturnMessage("小优还不够智能,请再次输入");
                 break;
         }
-        return XStreamTransformer.toXml(WxMpXmlMessage.class, returnMsg);
+        String rtn = XStreamTransformer.toXml(WxMpXmlMessage.class, returnMsg);
+        log.warn("wx_out_meg = {}", rtn);
+        return rtn;
     }
 
     private WxMpXmlMessage processTextMsg() {
