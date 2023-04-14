@@ -272,6 +272,8 @@ public class WChatService {
                 break;
 
         }
+
+        boxTextWxMsg(answer);
         return answer;
     }
 
@@ -290,6 +292,13 @@ public class WChatService {
         returnMsg.setContent(content);
         returnMsg.setMsgType(WxConsts.XmlMsgType.TEXT);
         return returnMsg;
+    }
+
+    private void boxTextWxMsg(WxMpXmlMessage wxMpXmlMessage) {
+        WChatContext wChatContext = WChatContext.get();
+        wxMpXmlMessage.setFromUser(wChatContext.getWitchWChatService());
+        wxMpXmlMessage.setToUser(wChatContext.getUser());
+        wxMpXmlMessage.setMsgType(WxConsts.XmlMsgType.TEXT);
     }
 
 

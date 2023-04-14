@@ -8,6 +8,9 @@ fi
 
 projectHead=$1
 
+echo $projectHead
+echo $1
+
 if  [ x"$projectHead" != "" ];then
   echo "tag"
   git checkout $projectHead
@@ -19,7 +22,7 @@ else
 fi
 
 #./gradlew :gpt-app:clean
-mv ./gpt-app/build/libs/gpt-app-1.0.jar
+rm ./gpt-app/build/libs/gpt-app-1.0.jar
 ./gradlew :gpt-app:bootJar
 
 gradleProcessId=`ps -ef | grep java | grep -i "gradle" | awk 'BEGIN{FS=" "}{print $2}'`
