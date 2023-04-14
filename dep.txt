@@ -32,7 +32,7 @@ compileClasspath - Compile classpath for source set 'main'.
 |    +--- org.checkerframework:checker-qual:3.12.0
 |    +--- com.google.errorprone:error_prone_annotations:2.11.0
 |    \--- com.google.j2objc:j2objc-annotations:1.3
-+--- org.springframework:spring-context:5.3.16 -> 5.3.24
++--- org.springframework:spring-context:5.3.24
 |    +--- org.springframework:spring-aop:5.3.24
 |    |    +--- org.springframework:spring-beans:5.3.24
 |    |    |    \--- org.springframework:spring-core:5.3.24
@@ -42,15 +42,15 @@ compileClasspath - Compile classpath for source set 'main'.
 |    +--- org.springframework:spring-core:5.3.24 (*)
 |    \--- org.springframework:spring-expression:5.3.24
 |         \--- org.springframework:spring-core:5.3.24 (*)
-+--- org.springframework:spring-webmvc:5.3.16
-|    +--- org.springframework:spring-aop:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-beans:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-context:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-core:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-expression:5.3.16 -> 5.3.24 (*)
-|    \--- org.springframework:spring-web:5.3.16
-|         +--- org.springframework:spring-beans:5.3.16 -> 5.3.24 (*)
-|         \--- org.springframework:spring-core:5.3.16 -> 5.3.24 (*)
++--- org.springframework:spring-webmvc:5.3.24
+|    +--- org.springframework:spring-aop:5.3.24 (*)
+|    +--- org.springframework:spring-beans:5.3.24 (*)
+|    +--- org.springframework:spring-context:5.3.24 (*)
+|    +--- org.springframework:spring-core:5.3.24 (*)
+|    +--- org.springframework:spring-expression:5.3.24 (*)
+|    \--- org.springframework:spring-web:5.3.24
+|         +--- org.springframework:spring-beans:5.3.24 (*)
+|         \--- org.springframework:spring-core:5.3.24 (*)
 +--- org.apache.tomcat.embed:tomcat-embed-core:9.0.58
 |    \--- org.apache.tomcat:tomcat-annotations-api:9.0.58
 +--- com.github.binarywang:weixin-java-mp:4.4.9.B
@@ -130,8 +130,8 @@ implementation - Implementation only dependencies for source set 'main'. (n)
 +--- com.theokanning.openai-gpt3-java:client:0.11.1 (n)
 +--- com.theokanning.openai-gpt3-java:api:0.11.1 (n)
 +--- com.google.guava:guava:31.1-jre (n)
-+--- org.springframework:spring-context:5.3.16 (n)
-+--- org.springframework:spring-webmvc:5.3.16 (n)
++--- org.springframework:spring-context:5.3.24 (n)
++--- org.springframework:spring-webmvc:5.3.24 (n)
 +--- org.apache.tomcat.embed:tomcat-embed-core:9.0.58 (n)
 +--- com.github.binarywang:weixin-java-mp:4.4.9.B (n)
 +--- org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.0 (n)
@@ -173,7 +173,7 @@ runtimeClasspath - Runtime classpath of source set 'main'.
 |    +--- org.checkerframework:checker-qual:3.12.0
 |    +--- com.google.errorprone:error_prone_annotations:2.11.0
 |    \--- com.google.j2objc:j2objc-annotations:1.3
-+--- org.springframework:spring-context:5.3.16 -> 5.3.24
++--- org.springframework:spring-context:5.3.24
 |    +--- org.springframework:spring-aop:5.3.24
 |    |    +--- org.springframework:spring-beans:5.3.24
 |    |    |    \--- org.springframework:spring-core:5.3.24
@@ -183,15 +183,15 @@ runtimeClasspath - Runtime classpath of source set 'main'.
 |    +--- org.springframework:spring-core:5.3.24 (*)
 |    \--- org.springframework:spring-expression:5.3.24
 |         \--- org.springframework:spring-core:5.3.24 (*)
-+--- org.springframework:spring-webmvc:5.3.16
-|    +--- org.springframework:spring-aop:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-beans:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-context:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-core:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-expression:5.3.16 -> 5.3.24 (*)
-|    \--- org.springframework:spring-web:5.3.16
-|         +--- org.springframework:spring-beans:5.3.16 -> 5.3.24 (*)
-|         \--- org.springframework:spring-core:5.3.16 -> 5.3.24 (*)
++--- org.springframework:spring-webmvc:5.3.24
+|    +--- org.springframework:spring-aop:5.3.24 (*)
+|    +--- org.springframework:spring-beans:5.3.24 (*)
+|    +--- org.springframework:spring-context:5.3.24 (*)
+|    +--- org.springframework:spring-core:5.3.24 (*)
+|    +--- org.springframework:spring-expression:5.3.24 (*)
+|    \--- org.springframework:spring-web:5.3.24
+|         +--- org.springframework:spring-beans:5.3.24 (*)
+|         \--- org.springframework:spring-core:5.3.24 (*)
 +--- org.apache.tomcat.embed:tomcat-embed-core:9.0.58
 |    \--- org.apache.tomcat:tomcat-annotations-api:9.0.58
 +--- com.github.binarywang:weixin-java-mp:4.4.9.B
@@ -292,7 +292,7 @@ testCompileClasspath - Compile classpath for source set 'test'.
 |    +--- org.checkerframework:checker-qual:3.12.0
 |    +--- com.google.errorprone:error_prone_annotations:2.11.0
 |    \--- com.google.j2objc:j2objc-annotations:1.3
-+--- org.springframework:spring-context:5.3.16 -> 5.3.24
++--- org.springframework:spring-context:5.3.24
 |    +--- org.springframework:spring-aop:5.3.24
 |    |    +--- org.springframework:spring-beans:5.3.24
 |    |    |    \--- org.springframework:spring-core:5.3.24
@@ -302,15 +302,15 @@ testCompileClasspath - Compile classpath for source set 'test'.
 |    +--- org.springframework:spring-core:5.3.24 (*)
 |    \--- org.springframework:spring-expression:5.3.24
 |         \--- org.springframework:spring-core:5.3.24 (*)
-+--- org.springframework:spring-webmvc:5.3.16
-|    +--- org.springframework:spring-aop:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-beans:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-context:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-core:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-expression:5.3.16 -> 5.3.24 (*)
-|    \--- org.springframework:spring-web:5.3.16
-|         +--- org.springframework:spring-beans:5.3.16 -> 5.3.24 (*)
-|         \--- org.springframework:spring-core:5.3.16 -> 5.3.24 (*)
++--- org.springframework:spring-webmvc:5.3.24
+|    +--- org.springframework:spring-aop:5.3.24 (*)
+|    +--- org.springframework:spring-beans:5.3.24 (*)
+|    +--- org.springframework:spring-context:5.3.24 (*)
+|    +--- org.springframework:spring-core:5.3.24 (*)
+|    +--- org.springframework:spring-expression:5.3.24 (*)
+|    \--- org.springframework:spring-web:5.3.24
+|         +--- org.springframework:spring-beans:5.3.24 (*)
+|         \--- org.springframework:spring-core:5.3.24 (*)
 +--- org.apache.tomcat.embed:tomcat-embed-core:9.0.58
 |    \--- org.apache.tomcat:tomcat-annotations-api:9.0.58
 +--- com.github.binarywang:weixin-java-mp:4.4.9.B
@@ -420,7 +420,7 @@ testRuntimeClasspath - Runtime classpath of source set 'test'.
 |    +--- org.checkerframework:checker-qual:3.12.0
 |    +--- com.google.errorprone:error_prone_annotations:2.11.0
 |    \--- com.google.j2objc:j2objc-annotations:1.3
-+--- org.springframework:spring-context:5.3.16 -> 5.3.24
++--- org.springframework:spring-context:5.3.24
 |    +--- org.springframework:spring-aop:5.3.24
 |    |    +--- org.springframework:spring-beans:5.3.24
 |    |    |    \--- org.springframework:spring-core:5.3.24
@@ -430,15 +430,15 @@ testRuntimeClasspath - Runtime classpath of source set 'test'.
 |    +--- org.springframework:spring-core:5.3.24 (*)
 |    \--- org.springframework:spring-expression:5.3.24
 |         \--- org.springframework:spring-core:5.3.24 (*)
-+--- org.springframework:spring-webmvc:5.3.16
-|    +--- org.springframework:spring-aop:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-beans:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-context:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-core:5.3.16 -> 5.3.24 (*)
-|    +--- org.springframework:spring-expression:5.3.16 -> 5.3.24 (*)
-|    \--- org.springframework:spring-web:5.3.16
-|         +--- org.springframework:spring-beans:5.3.16 -> 5.3.24 (*)
-|         \--- org.springframework:spring-core:5.3.16 -> 5.3.24 (*)
++--- org.springframework:spring-webmvc:5.3.24
+|    +--- org.springframework:spring-aop:5.3.24 (*)
+|    +--- org.springframework:spring-beans:5.3.24 (*)
+|    +--- org.springframework:spring-context:5.3.24 (*)
+|    +--- org.springframework:spring-core:5.3.24 (*)
+|    +--- org.springframework:spring-expression:5.3.24 (*)
+|    \--- org.springframework:spring-web:5.3.24
+|         +--- org.springframework:spring-beans:5.3.24 (*)
+|         \--- org.springframework:spring-core:5.3.24 (*)
 +--- org.apache.tomcat.embed:tomcat-embed-core:9.0.58
 |    \--- org.apache.tomcat:tomcat-annotations-api:9.0.58
 +--- com.github.binarywang:weixin-java-mp:4.4.9.B

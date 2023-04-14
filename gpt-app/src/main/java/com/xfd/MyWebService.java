@@ -3,6 +3,7 @@ package com.xfd;
 import com.xfd.common.dao.ChatRecord;
 import com.xfd.common.mapper.ChatRecordMapper;
 import com.xfd.openai.entity.UserDescribe;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@Slf4j
 public class MyWebService implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
@@ -54,6 +56,7 @@ public class MyWebService implements ApplicationContextAware {
 
     @RequestMapping(value = "/hello", method = RequestMethod.GET)
     ResponseEntity<String> test1() {
+        log.error("shit");
         List<ChatRecord> chatRecords = chatRecordMapper.selectCurrentChat("shit", "hello");
         return ResponseEntity.ok("hello_world");
     }

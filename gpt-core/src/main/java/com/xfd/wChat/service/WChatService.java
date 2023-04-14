@@ -2,6 +2,7 @@ package com.xfd.wChat.service;
 
 import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
+import com.xfd.common.UserCacheService;
 import com.xfd.common.dao.UserCommonInfo;
 import com.xfd.common.mapper.UserCommonInfoMapper;
 import com.xfd.wChat.practise.ChatStatus;
@@ -12,6 +13,7 @@ import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.util.http.okhttp.DefaultOkHttpClientBuilder;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceOkHttpImpl;
+import me.chanjar.weixin.mp.bean.kefu.WxMpKefuMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.config.impl.WxMpMapConfigImpl;
 import me.chanjar.weixin.mp.util.xml.XStreamTransformer;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -39,6 +42,9 @@ public class WChatService {
     private String appSecret;
 
     private WxMpService wxMpService;
+
+    @Autowired
+    private UserCacheService userCacheService;
 
     @PostConstruct
     private void initInnerService() {
@@ -54,15 +60,6 @@ public class WChatService {
         wxMpServiceOkHttp.initHttp();
         wxMpService = wxMpServiceOkHttp;
     }
-
-
-    @Autowired
-    @Qualifier("wChat_status_cache")
-    private Cache<String, ChatStatus> wChatCache;
-
-    @Autowired
-    @Qualifier("wChat_data")
-    private Cache<String, Object> wChatDataCache;
 
     public String getWxAccessToken() {
         try {
@@ -147,22 +144,22 @@ public class WChatService {
                 switch (WChatContext.getInputContent()) {
                     case "1":
                     case "事业":
-                        wChatDataCache.put("practice_destiny", "事业");
+                        userCacheService.updateUserCache("practice_destiny", "事业");
                         answer.setContent("好的,那能描述一下这方面的近况吗?如果不想请输入\"没了\"");
                         break;
                     case "2":
                     case "爱情":
-                        wChatDataCache.put("practice_destiny", "爱情");
+                        userCacheService.updateUserCache("practice_destiny", "爱情");
                         answer.setContent("好的,那能描述一下这方面的近况吗?如果不想请输入\"没了\"");
                         break;
                     case "3":
                     case "友情":
-                        wChatDataCache.put("practice_destiny", "友情");
+                        userCacheService.updateUserCache("practice_destiny", "友情");
                         answer.setContent("好的,那能描述一下这方面的近况吗?如果不想请输入\"没了\"");
                         break;
                     case "4":
                     case "财运":
-                        wChatDataCache.put("practice_destiny", "财运");
+                        userCacheService.updateUserCache("practice_destiny", "财运");
                         answer.setContent("好的,那能描述一下这方面的近况吗?如果不想请输入\"没了\"");
                         break;
                     case "5":
@@ -182,11 +179,11 @@ public class WChatService {
                     answer.setContent("嗯嗯,想预测什么时期的运势呢?\n1,一周内\n2,一月内\n3,一年内\n4,随便预测");
                     updateUserWChatStatus(ChatStatus.SELECTING_PRACTISE_TIME);
                 } else {
-                    String cacheDescribe = (String) wChatDataCache.getIfPresent("practice_recent_info");
+                    String cacheDescribe = userCacheService.getUserCache("practice_recent_info");
                     if (cacheDescribe == null) {
-                        wChatDataCache.put("practice_recent_info", describe);
+                        userCacheService.updateUserCache("practice_recent_info", describe);
                     } else {
-                        wChatDataCache.put("practice_recent_info", cacheDescribe + "," + describe);
+                        userCacheService.updateUserCache("practice_recent_info", cacheDescribe + "," + describe);
                     }
                     answer.setContent("嗯嗯,小优在听,还有吗?没有请输入\"没了\"");
                 }
@@ -196,7 +193,7 @@ public class WChatService {
                 switch (WChatContext.getInputContent()) {
                     case "1":
                     case "一周内":
-                        wChatDataCache.put("practice_time", "一周内");
+                        userCacheService.updateUserCache("practice_time", "一周内");
 //                        userCommonInfo = userCommonInfoMapper.selectUserCommonInfoByUserId(WChatContext.getWChatUser());
 //                        if (userCommonInfo == null) {
 //                        userCommonInfoMapper.insertNewUserCommonInfo(WChatContext.getWChatUser(), System.currentTimeMillis());
@@ -208,14 +205,14 @@ public class WChatService {
                         break;
                     case "2":
                     case "一月内":
-                        wChatDataCache.put("practice_time", "一月内");
+                        userCacheService.updateUserCache("practice_time", "一月内");
 //                        userCommonInfo = userCommonInfoMapper.selectUserCommonInfoByUserId(WChatContext.getWChatUser());
                         answer.setContent("知道辽,想要测得准,能提供一下一些个人信息吗,能让预测更加准确,我问你答。\n1,可以\n2,算了吧");
                         updateUserWChatStatus(ChatStatus.REPLENISH_SELF_DETAIL);
                         break;
                     case "3":
                     case "一年内":
-                        wChatDataCache.put("practice_time", "一年内");
+                        userCacheService.updateUserCache("practice_time", "一年内");
 //                        userCommonInfo = userCommonInfoMapper.selectUserCommonInfoByUserId(WChatContext.getWChatUser());
                         answer.setContent("知道辽,想要测得准,能提供一下一些个人信息吗,能让预测更加准确,我问你答。\n1,可以\n2,算了吧");
                         updateUserWChatStatus(ChatStatus.REPLENISH_SELF_DETAIL);
@@ -231,17 +228,17 @@ public class WChatService {
                 }
                 break;
             case REPLENISH_SELF_DETAIL:
-                Integer detailStep = (Integer) wChatDataCache.getIfPresent("REPLENISH_SELF_DETAIL_STEP");
+                Integer detailStep = userCacheService.getUserCache("REPLENISH_SELF_DETAIL_STEP");
                 if (detailStep != null) {
                     switch (detailStep) {
                         case 1:
-                            ((UserCommonInfo) wChatDataCache.getIfPresent("REPLENISH_SELF_DETAIL")).setName(WChatContext.getInputContent());
-                            wChatDataCache.put("REPLENISH_SELF_DETAIL_STEP", 2);
+                            ((UserCommonInfo) userCacheService.getUserCache("REPLENISH_SELF_DETAIL")).setName(WChatContext.getInputContent());
+                            userCacheService.updateUserCache("REPLENISH_SELF_DETAIL_STEP", 2);
                             answer.setContent("您的生日是?");
                             break;
                         case 2:
-                            ((UserCommonInfo) wChatDataCache.getIfPresent("REPLENISH_SELF_DETAIL")).setBirthday(WChatContext.getInputContent());
-                            wChatDataCache.put("REPLENISH_SELF_DETAIL_STEP", 3);
+                            ((UserCommonInfo) userCacheService.getUserCache("REPLENISH_SELF_DETAIL")).setBirthday(WChatContext.getInputContent());
+                            userCacheService.updateUserCache("REPLENISH_SELF_DETAIL_STEP", 3);
                             updateUserWChatStatus(ChatStatus.PREDICTING);
                             answer.setContent("小优开始施法了,请耐心等一下");
                             predict();
@@ -251,8 +248,8 @@ public class WChatService {
                     switch (WChatContext.getInputContent()) {
                         case "1":
                         case "可以":
-                            wChatDataCache.put("REPLENISH_SELF_DETAIL", new UserCommonInfo());
-                            wChatDataCache.put("REPLENISH_SELF_DETAIL_STEP", 1);
+                            userCacheService.updateUserCache("REPLENISH_SELF_DETAIL", new UserCommonInfo());
+                            userCacheService.updateUserCache("REPLENISH_SELF_DETAIL_STEP", 1);
                             answer.setContent("您的名字是?(真名或者昵称)");
                             break;
                         case "2":
@@ -294,18 +291,44 @@ public class WChatService {
 
 
     private ChatStatus getUserWChatStatus() {
-        ChatStatus chatStatus = wChatCache.getIfPresent(WChatContext.getWChatUser());
-        return chatStatus == null ? ChatStatus.JUST_ENTER : chatStatus;
+        return userCacheService.getCurrentChatStatus();
     }
 
     private void updateUserWChatStatus(ChatStatus status) {
-        wChatCache.put(WChatContext.getWChatUser(), status);
+        userCacheService.updateChatStatus(status);
     }
 
     private void predict() {
         //mock
 
+        WChatContext wChatContext = WChatContext.get();
+        scheduledExecutorService.schedule(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    WChatContext.setDesigned(wChatContext);
+                    WxMpKefuMessage wxMpKefuMessage = new WxMpKefuMessage();
+                    wxMpKefuMessage.setContent("你好,你的运势预测出来了");
+                    wxMpKefuMessage.setToUser(wChatContext.getUser());
+                    wxMpKefuMessage.setMsgType(WxConsts.KefuMsgType.TEXT);
+                    boolean success = wxMpService.getKefuService().sendKefuMessage(wxMpKefuMessage);
+                    if (!success) {
+                        log.error("kefu_error");
+                    } else {
+                        updateUserWChatStatus(ChatStatus.JUST_ENTER);
+                    }
+                } catch (Exception e) {
+                    log.error("kefu_error", e);
+                } finally {
+                    WChatContext.clear();
+                }
+
+            }
+        }, 10, TimeUnit.SECONDS);
     }
+
+    @Autowired
+    private ScheduledExecutorService scheduledExecutorService;
 
 //    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.HOURS)
 //    private void obtainwChatAccessToken() {
