@@ -292,6 +292,7 @@ public class WChatService {
         returnMsg.setToUser(wChatContext.getUser());
         returnMsg.setContent(content);
         returnMsg.setMsgType(WxConsts.XmlMsgType.TEXT);
+        returnMsg.setCreateTime(System.currentTimeMillis());
         return returnMsg;
     }
 
@@ -300,6 +301,7 @@ public class WChatService {
         wxMpXmlMessage.setFromUser(wChatContext.getWitchWChatService());
         wxMpXmlMessage.setToUser(wChatContext.getUser());
         wxMpXmlMessage.setMsgType(WxConsts.XmlMsgType.TEXT);
+        wxMpXmlMessage.setCreateTime(System.currentTimeMillis());
     }
 
 
