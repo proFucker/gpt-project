@@ -2,7 +2,7 @@ appProcessId=`ps -ef | grep java | grep "gpt-app" | awk 'BEGIN{FS=" "}{print $2}
 
 echo $appProcessId
 
-if  [ x"$appProcessId" != "" ];then
+if  [ -n "$appProcessId" ];then
   kill $appProcessId
 fi
 
@@ -11,7 +11,7 @@ projectHead=$1
 echo $projectHead
 echo $1
 
-if  [ x"$projectHead" != "" ];then
+if  [ -n "$projectHead" ];then
   echo "tag"
   git checkout $projectHead
   git pull
