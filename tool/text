@@ -1,0 +1,1 @@
+curl -H 'Content-type:text/xml' -X POST -d @shit.txt http://localhost:8080/wx

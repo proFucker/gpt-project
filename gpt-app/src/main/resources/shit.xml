@@ -1,0 +1,14 @@
+<xml>
+    <ToUserName><![CDATA[oSz5h6efasXLCioPxe-MD8Y0NkaU]]></ToUserName>
+    <FromUserName><![CDATA[gh_ab5d4378c71d]]></FromUserName>
+    <MsgType><![CDATA[text]]></MsgType>
+    <Content>
+        <![CDATA[这里是小优,有什么可以帮您?预测运势请输入"1,运势"查看旅游攻略请输入"2,旅游"请输入前面的数字]]></Content>
+    <ScanCodeInfo/>
+    <SendPicsInfo>
+        <PicList/>
+    </SendPicsInfo>
+    <SendLocationInfo/>
+    <ArticleUrlResult/>
+    <HardWare/>
+</xml>
