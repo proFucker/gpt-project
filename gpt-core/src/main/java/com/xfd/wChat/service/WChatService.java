@@ -88,6 +88,7 @@ public class WChatService {
         statusMatchers.add(new ReplenishUserDetailMatcher1());
         statusMatchers.add(new ReplenishUserDetailMatcher2());
         statusMatchers.add(new ReplenishUserDetailMatcher3());
+        statusMatchers.add(new ReplenishUserDetailMatcher4Name());
         statusMatchers.add(new ReplenishUserDetailMatcher4Birthday());
         statusMatchers.add(new ReplenishUserDetailMatcher5Job());
         statusMatchers.add(new ReplenishUserDetailMatcher6HeightWeight());
