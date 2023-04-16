@@ -46,8 +46,8 @@ public class UserCacheService {
     @PostConstruct
     private void init() {
         localCache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.MINUTES)
-            .maximumSize(10)
-            .weakKeys()
+            .maximumSize(400)
+            .concurrencyLevel(4)
             .build();
     }
 
