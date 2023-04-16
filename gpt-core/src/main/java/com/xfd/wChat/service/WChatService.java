@@ -275,7 +275,7 @@ public class WChatService {
 
     private void selectWhich2PracticeAnswer() {
         WChatContext.setAnswerContent("小优明白了,你想预测哪方面的运势捏?\n1,事业\n2,爱情\n3,友情\n4,财运\n5,随便\n请输入前面的数字");
-        updateUserWChatStatus(ChatStatus.SELECTING_DESTINY);
+        updateUserWChatStatus(ChatStatus.REPLENISH_SELF_DETAIL);
     }
 
     private void miss() {
@@ -621,6 +621,10 @@ public class WChatService {
 
         @Override
         public boolean match() {
+            log.error("shit,{},{},{}",getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
+                (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 1,
+                (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 1,
+                (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP));
             return getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
                 (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 1;
         }
