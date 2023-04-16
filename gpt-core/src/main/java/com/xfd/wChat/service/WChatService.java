@@ -261,7 +261,7 @@ public class WChatService {
                         log.error("kefu_success");
                         updateUserWChatStatus(ChatStatus.JUST_ENTER);
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     log.error("kefu_error", e);
                 } finally {
                     WChatContext.clear();
