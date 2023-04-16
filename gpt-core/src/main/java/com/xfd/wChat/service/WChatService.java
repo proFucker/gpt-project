@@ -621,7 +621,7 @@ public class WChatService {
         @Override
         public boolean match() {
             return getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
-                (Integer) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 1;
+                (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 1;
         }
 
         @Override
@@ -637,7 +637,7 @@ public class WChatService {
         @Override
         public boolean match() {
             return getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
-                (Integer) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 2;
+                (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 2;
         }
 
         @Override
@@ -653,7 +653,7 @@ public class WChatService {
         @Override
         public boolean match() {
             return getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
-                (Integer) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 3;
+                (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 3;
         }
 
         @Override
@@ -669,7 +669,7 @@ public class WChatService {
         @Override
         public boolean match() {
             return getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
-                (Integer) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 4;
+                (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 4;
         }
 
         @Override
