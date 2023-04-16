@@ -621,6 +621,11 @@ public class WChatService {
 
         @Override
         public boolean match() {
+            log.error("shit,{},{},{}",getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
+                    (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 1,
+                (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 1,
+                (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP));
+
             return getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
                 (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 1;
         }
