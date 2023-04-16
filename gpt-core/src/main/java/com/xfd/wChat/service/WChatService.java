@@ -240,12 +240,17 @@ public class WChatService {
             currentStatus,
             timeStr,
             destinyStr);
+
+        log.error("start_ky");
         scheduledExecutorService.schedule(new Runnable() {
             @Override
             public void run() {
+                log.error("start_ky_1");
                 try {
                     WChatContext.setDesigned(wChatContext);
+                    log.error("start_ky_2");
                     WxMpKefuMessage wxMpKefuMessage = new WxMpKefuMessage();
+                    log.error("start_ky_3");
                     wxMpKefuMessage.setContent(String.format("你好,你的运势预测出来了,请求串是:%s", query));
                     wxMpKefuMessage.setToUser(wChatContext.getUser());
                     wxMpKefuMessage.setMsgType(WxConsts.KefuMsgType.TEXT);
@@ -293,6 +298,7 @@ public class WChatService {
     }
 
     @Autowired
+    @Qualifier("scheduledExecutorService")
     private ScheduledExecutorService scheduledExecutorService;
 
     private class JustEnterMatcher1 implements StatusMatcher {
