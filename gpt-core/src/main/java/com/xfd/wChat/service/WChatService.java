@@ -85,6 +85,13 @@ public class WChatService {
         statusMatchers.add(new SelectPracticeTimeMatcher3());
         statusMatchers.add(new SelectPracticeTimeMatcher4());
         statusMatchers.add(new SelectPracticeTimeMatcher5());
+        statusMatchers.add(new ReplenishUserDetailMatcher1());
+        statusMatchers.add(new ReplenishUserDetailMatcher2());
+        statusMatchers.add(new ReplenishUserDetailMatcher3());
+        statusMatchers.add(new ReplenishUserDetailMatcher4Birthday());
+        statusMatchers.add(new ReplenishUserDetailMatcher5Job());
+        statusMatchers.add(new ReplenishUserDetailMatcher6HeightWeight());
+        statusMatchers.add(new PracticingMatcher());
         allMissMatcher = new AllMissMatcher();
     }
 
@@ -165,43 +172,7 @@ public class WChatService {
 //        UserCommonInfo userCommonInfo = null;
 //        switch (chatStatus) {
 //
-//            case REPLENISH_SELF_DETAIL:
-//                Integer detailStep = userCacheService.getUserCache("REPLENISH_SELF_DETAIL_STEP");
-//                if (detailStep != null) {
-//                    switch (detailStep) {
-//                        case 1:
-//                            ((UserCommonInfo) userCacheService.getUserCache("REPLENISH_SELF_DETAIL")).setName(WChatContext.getInputContent());
-//                            userCacheService.updateUserCache("REPLENISH_SELF_DETAIL_STEP", 2);
-//                            answer.setContent("您的生日是?");
-//                            break;
-//                        case 2:
-//                            ((UserCommonInfo) userCacheService.getUserCache("REPLENISH_SELF_DETAIL")).setBirthday(WChatContext.getInputContent());
-//                            userCacheService.updateUserCache("REPLENISH_SELF_DETAIL_STEP", 3);
-//                            updateUserWChatStatus(ChatStatus.PREDICTING);
-//                            answer.setContent("小优开始施法了,请耐心等一下");
-//                            predict();
-//                            break;
-//                    }
-//                } else {
-//                    switch (WChatContext.getInputContent()) {
-//                        case "1":
-//                        case "可以":
-//                            userCacheService.updateUserCache("REPLENISH_SELF_DETAIL", new UserCommonInfo());
-//                            userCacheService.updateUserCache("REPLENISH_SELF_DETAIL_STEP", 1);
-//                            answer.setContent("您的名字是?(真名或者昵称)");
-//                            break;
-//                        case "2":
-//                        case "算了吧":
-//                            updateUserWChatStatus(ChatStatus.PREDICTING);
-//                            answer.setContent("小优开始施法了,请耐心等一下");
-//                            predict();
-//                            break;
-//                        default:
-//                            answer.setContent("存在于虚空的选项呢,请重新选择...");
-//                            break;
-//                    }
-//                }
-//                break;
+//
 //            case PREDICTING:
 //                answer.setContent("小优还在施法中,请耐心等一等哦");
 //                break;
@@ -251,19 +222,37 @@ public class WChatService {
         //mock
 
         WChatContext wChatContext = WChatContext.get();
+        UserCommonInfo userCommonInfo = userCacheService.getUserCache(REPLENISH_SELF_DETAIL);
+
+        String time = userCacheService.getUserCache("practice_time");
+        String currentStatus = userCacheService.getUserCache("practice_recent_info");
+        String destiny = userCacheService.getUserCache("practice_destiny");
+
+        String timeStr = time != null ? "接下来" + time : "";
+        String destinyStr = destiny != null ? "有关" + destiny + "方面的" : "";
+        String query = String.format("我叫%s,生日是%s,目前的工作是%s,身高体重是%s," +
+                "而我目前的状况是%s,能否帮我预测一下%s%s运势",
+            userCommonInfo.getName(),
+            userCommonInfo.getBirthday(),
+            userCommonInfo.getJob(),
+            userCommonInfo.getHeightWeight(),
+            currentStatus,
+            timeStr,
+            destinyStr);
         scheduledExecutorService.schedule(new Runnable() {
             @Override
             public void run() {
                 try {
                     WChatContext.setDesigned(wChatContext);
                     WxMpKefuMessage wxMpKefuMessage = new WxMpKefuMessage();
-                    wxMpKefuMessage.setContent("你好,你的运势预测出来了");
+                    wxMpKefuMessage.setContent(String.format("你好,你的运势预测出来了,请求串是:%s", query));
                     wxMpKefuMessage.setToUser(wChatContext.getUser());
                     wxMpKefuMessage.setMsgType(WxConsts.KefuMsgType.TEXT);
                     boolean success = wxMpService.getKefuService().sendKefuMessage(wxMpKefuMessage);
                     if (!success) {
                         log.error("kefu_error");
                     } else {
+                        log.error("kefu_success");
                         updateUserWChatStatus(ChatStatus.JUST_ENTER);
                     }
                 } catch (Exception e) {
@@ -284,7 +273,7 @@ public class WChatService {
     }
 
     private void selectWhich2PracticeAnswer() {
-        WChatContext.setAnswerContent("小优明白了,你想预测哪方面的运势捏?\n1,事业\n2,爱情\n3,友情\n4,财运\n5,其他\n6,随便\n请输入前面的数字");
+        WChatContext.setAnswerContent("小优明白了,你想预测哪方面的运势捏?\n1,事业\n2,爱情\n3,友情\n4,财运\n5,随便\n请输入前面的数字");
         updateUserWChatStatus(ChatStatus.SELECTING_DESTINY);
     }
 
@@ -561,7 +550,6 @@ public class WChatService {
 
         @Override
         public void action() {
-            userCacheService.updateUserCache("practice_time", keyWord);
             WChatContext.setAnswerContent("知道辽,想要测得准,能提供一下一些个人信息吗,能让预测更加准确,我问你答。\n1,可以\n2,算了吧");
             updateUserWChatStatus(ChatStatus.REPLENISH_SELF_DETAIL);
         }
@@ -580,6 +568,136 @@ public class WChatService {
         }
     }
 
+    private class ReplenishUserDetailMatcher1 implements StatusMatcher {
+
+        @Override
+        public boolean match() {
+            return getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
+                userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == null &&
+                (StringUtils.equals("2", WChatContext.getInputContent()) || StringUtils.equals("算了吧", WChatContext.getInputContent()));
+        }
+
+        @Override
+        public void action() {
+            updateUserWChatStatus(ChatStatus.PREDICTING);
+            WChatContext.setAnswerContent("小优开始施法了,请耐心等一下");
+            predict();
+        }
+    }
+
+    private class ReplenishUserDetailMatcher2 implements StatusMatcher {
+
+        @Override
+        public boolean match() {
+            return getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
+                userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == null &&
+                (StringUtils.equals("1", WChatContext.getInputContent()) || StringUtils.equals("可以", WChatContext.getInputContent()));
+        }
+
+        @Override
+        public void action() {
+            userCacheService.updateUserCache(REPLENISH_SELF_DETAIL, new UserCommonInfo());
+            userCacheService.updateUserCache(REPLENISH_SELF_DETAIL_STEP, 1);
+            WChatContext.setAnswerContent("您的名字是?(真名或者昵称)");
+        }
+    }
+
+    private class ReplenishUserDetailMatcher3 implements StatusMatcher {
+
+        @Override
+        public boolean match() {
+            return getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
+                userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == null;
+        }
+
+        @Override
+        public void action() {
+            miss();
+        }
+    }
+
+    private class ReplenishUserDetailMatcher4Name implements StatusMatcher {
+
+        @Override
+        public boolean match() {
+            return getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
+                (Integer) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 1;
+        }
+
+        @Override
+        public void action() {
+            ((UserCommonInfo) userCacheService.getUserCache(REPLENISH_SELF_DETAIL)).setName(WChatContext.getInputContent());
+            userCacheService.updateUserCache(REPLENISH_SELF_DETAIL_STEP, 2);
+            WChatContext.setAnswerContent("您的生日是?");
+        }
+    }
+
+    private class ReplenishUserDetailMatcher4Birthday implements StatusMatcher {
+
+        @Override
+        public boolean match() {
+            return getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
+                (Integer) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 2;
+        }
+
+        @Override
+        public void action() {
+            ((UserCommonInfo) userCacheService.getUserCache(REPLENISH_SELF_DETAIL)).setBirthday(WChatContext.getInputContent());
+            userCacheService.updateUserCache(REPLENISH_SELF_DETAIL_STEP, 3);
+            WChatContext.setAnswerContent("您目前的工作是?");
+        }
+    }
+
+    private class ReplenishUserDetailMatcher5Job implements StatusMatcher {
+
+        @Override
+        public boolean match() {
+            return getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
+                (Integer) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 3;
+        }
+
+        @Override
+        public void action() {
+            ((UserCommonInfo) userCacheService.getUserCache(REPLENISH_SELF_DETAIL)).setJob(WChatContext.getInputContent());
+            userCacheService.updateUserCache(REPLENISH_SELF_DETAIL_STEP, 4);
+            WChatContext.setAnswerContent("您的身高体重是?");
+        }
+    }
+
+    private class ReplenishUserDetailMatcher6HeightWeight implements StatusMatcher {
+
+        @Override
+        public boolean match() {
+            return getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
+                (Integer) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 4;
+        }
+
+        @Override
+        public void action() {
+            ((UserCommonInfo) userCacheService.getUserCache(REPLENISH_SELF_DETAIL)).setHeightWeight(WChatContext.getInputContent());
+            userCacheService.updateUserCache(REPLENISH_SELF_DETAIL_STEP, 5);
+            updateUserWChatStatus(ChatStatus.PREDICTING);
+            WChatContext.setAnswerContent("小优开始施法了,请耐心等一下");
+            predict();
+        }
+    }
+
+    private class PracticingMatcher implements StatusMatcher {
+
+        @Override
+        public boolean match() {
+            return getUserWChatStatus() == ChatStatus.PREDICTING;
+        }
+
+        @Override
+        public void action() {
+            WChatContext.setAnswerContent("小优正在施法中,请耐心等一下");
+        }
+    }
+
+    private String REPLENISH_SELF_DETAIL_STEP = "REPLENISH_SELF_DETAIL_STEP";
+    private String REPLENISH_SELF_DETAIL = "REPLENISH_SELF_DETAIL";
+
 
     private class AllMissMatcher implements StatusMatcher {
         @Override
@@ -593,6 +711,7 @@ public class WChatService {
         }
 
     }
+
 
 //    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.HOURS)
 //    private void obtainwChatAccessToken() {

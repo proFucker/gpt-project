@@ -19,13 +19,11 @@ public class UserCacheService {
 
     @NotNull
     public ChatStatus getCurrentChatStatus() {
-        log.warn("wrapKey = {}", wrapKey(CHAT_STATUS_KEY));
         ChatStatus chatStatus = (ChatStatus) localCache.getIfPresent(wrapKey(CHAT_STATUS_KEY));
         return chatStatus == null ? ChatStatus.JUST_ENTER : chatStatus;
     }
 
     public void updateChatStatus(ChatStatus chatStatus) {
-        log.warn("wrapKey = {}", wrapKey(CHAT_STATUS_KEY));
         localCache.put(wrapKey(CHAT_STATUS_KEY), chatStatus);
     }
 
