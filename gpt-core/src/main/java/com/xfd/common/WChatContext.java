@@ -22,6 +22,8 @@ public class WChatContext {
     //wx转发的消息
     private WxMpXmlMessage wxMpXmlMessage;
 
+    private WxMpXmlMessage wxAnswerMsg = new WxMpXmlMessage();
+
     public static void setDesigned(WChatContext designed) {
         contextHolder.set(designed);
     }
@@ -38,8 +40,20 @@ public class WChatContext {
         return contextHolder.get().getUser();
     }
 
+    public static WxMpXmlMessage getWxInMsg() {
+        return get().getWxMpXmlMessage();
+    }
+
+    public static WxMpXmlMessage getWxOutMsg() {
+        return get().getWxAnswerMsg();
+    }
+
     public static String getInputContent() {
-        return contextHolder.get().getWxMpXmlMessage().getContent();
+        return get().getWxMpXmlMessage().getContent();
+    }
+
+    public static void setAnswerContent(String content) {
+        get().getWxAnswerMsg().setContent(content);
     }
 
     public static void clear() {
