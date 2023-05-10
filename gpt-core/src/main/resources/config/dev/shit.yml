@@ -12,3 +12,12 @@ openAi:
     prompt: 你是远近小有名气的运势预测师,专业给别人预测运势的
   chat:
     model: gpt-3.5-turbo
+    token: 2000
+
+wxChat:
+  content:
+    menu: |
+      这里是只因,有什么可以帮您?
+      预测运势请输入"1,运势"
+      查看旅游攻略请输入"2,旅游"
+      请输入前面的数字

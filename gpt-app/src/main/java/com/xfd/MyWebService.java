@@ -6,6 +6,7 @@ import com.xfd.openai.entity.UserDescribe;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.ResponseEntity;
@@ -51,8 +52,11 @@ public class MyWebService implements ApplicationContextAware {
     @RequestMapping(value = "/test1", method = RequestMethod.GET)
     ResponseEntity<String> test1(@RequestParam String key) {
 
-        return ResponseEntity.ok(key);
+        return ResponseEntity.ok(menuContent);
     }
+
+    @Value("${wxChat.content.menu}")
+    private String menuContent;
 
     @RequestMapping(value = "/hello", method = RequestMethod.GET)
     ResponseEntity<String> test1() {

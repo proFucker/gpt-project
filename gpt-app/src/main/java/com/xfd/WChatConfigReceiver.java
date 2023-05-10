@@ -1,10 +1,8 @@
 package com.xfd;
 
-import com.xfd.wChat.service.WChatService;
+import com.xfd.wChat.service.WxChatService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +20,7 @@ import java.util.Arrays;
 public class WChatConfigReceiver {
 
     @Autowired
-    private WChatService wChatService;
+    private WxChatService wxChatService;
 
     @Autowired
     private Environment environment;
@@ -35,7 +33,7 @@ public class WChatConfigReceiver {
                                           @RequestParam(required = false) String timestamp,
                                           @RequestParam(required = false) String nonce,
                                           @RequestBody String xmlData) {
-        return ResponseEntity.ok(wChatService.processWXPushData(xmlData));
+        return ResponseEntity.ok(wxChatService.processWXPushData(xmlData));
     }
 
     @RequestMapping(value = "/wx", method = RequestMethod.GET)

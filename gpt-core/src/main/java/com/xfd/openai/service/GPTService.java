@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.time.Duration;
+import java.util.List;
 
 import static com.theokanning.openai.service.OpenAiService.buildApi;
 
@@ -24,7 +25,7 @@ public class GPTService {
     private OpenAiService service;
 
     @Value("${openAi.practice.model}")
-    private String robotName;
+    private String modelName;
 
     @Value("${openAi.practice.token}")
     private int tokenSize;
@@ -32,7 +33,7 @@ public class GPTService {
     @Value("${openAi.practice.prompt}")
     private String practicePrompt;
 
-    @PostConstruct
+//    @PostConstruct
     private void initGPTService() {
         String token = System.getenv("openAiKey");
         service = new OpenAiService(buildApi(token, Duration.ofSeconds(60)));
@@ -41,7 +42,7 @@ public class GPTService {
     public String practise(String userDescribe) {
         try {
             ChatCompletionRequest chatCompletionRequest = new ChatCompletionRequest();
-            chatCompletionRequest.setModel(robotName);
+            chatCompletionRequest.setModel(modelName);
             chatCompletionRequest.setMaxTokens(tokenSize);
             chatCompletionRequest.setN(1);
             ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), practicePrompt);
@@ -49,6 +50,28 @@ public class GPTService {
             chatCompletionRequest.setMessages(Lists.newArrayList(systemMessage, userMessage));
             ChatCompletionResult chatCompletionResult = service.createChatCompletion(chatCompletionRequest);
             return chatCompletionResult.getChoices().get(0).getMessage().getContent();
+        } catch (Exception e) {
+            log.error("openai_interface_error", e);
+            throw new OpenAiException(e);
+        }
+    }
+
+
+    @Value("${openAi.chat.model}")
+    private String chatModel;
+
+    @Value("${openAi.chat.token}")
+    private int chatTokenSize;
+
+    public ChatMessage chat(List<ChatMessage> chatContext) {
+        try {
+            ChatCompletionRequest chatCompletionRequest = new ChatCompletionRequest();
+            chatCompletionRequest.setModel(chatModel);
+            chatCompletionRequest.setMaxTokens(chatTokenSize);
+            chatCompletionRequest.setN(1);
+            chatCompletionRequest.setMessages(chatContext);
+            ChatCompletionResult chatCompletionResult = service.createChatCompletion(chatCompletionRequest);
+            return chatCompletionResult.getChoices().get(0).getMessage();
         } catch (Exception e) {
             log.error("openai_interface_error", e);
             throw new OpenAiException(e);
