@@ -1,2 +1,13 @@
 shit:
   value1: shit1
+
+
+robot:
+  name: 只因
+
+
+openAi:
+  practice:
+    model: gpt-3.5-turbo
+  chat:
+    model: gpt-3.5-turbo

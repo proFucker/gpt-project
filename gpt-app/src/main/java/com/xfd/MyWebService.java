@@ -45,8 +45,8 @@ public class MyWebService implements ApplicationContextAware {
 //    }
 
 
-    @Autowired
-    ChatRecordMapper chatRecordMapper;
+//    @Autowired
+//    ChatRecordMapper chatRecordMapper;
 
     @RequestMapping(value = "/test1", method = RequestMethod.GET)
     ResponseEntity<String> test1(@RequestParam String key) {
@@ -56,16 +56,16 @@ public class MyWebService implements ApplicationContextAware {
 
     @RequestMapping(value = "/hello", method = RequestMethod.GET)
     ResponseEntity<String> test1() {
-        log.error("shit");
-        List<ChatRecord> chatRecords = chatRecordMapper.selectCurrentChat("shit", "hello");
+//        log.error("shit");
+//        List<ChatRecord> chatRecords = chatRecordMapper.selectCurrentChat("shit", "hello");
         return ResponseEntity.ok("hello_world");
     }
 
     @RequestMapping(value = "/hello", method = RequestMethod.POST)
     ResponseEntity<String> test2(@RequestParam(required = false) String shit) {
-        boolean ii = chatRecordMapper.batchSaveChatRecord(Arrays.asList(new ChatRecord()
-            .setRole("i").setContent(UUID.randomUUID().toString()).setUserId("shit").setContextKey("hello")));
-        System.out.println(shit);
+//        boolean ii = chatRecordMapper.batchSaveChatRecord(Arrays.asList(new ChatRecord()
+//            .setRole("i").setContent(UUID.randomUUID().toString()).setUserId("shit").setContextKey("hello")));
+//        System.out.println(shit);
         return ResponseEntity.ok("hello_world_post");
     }
 

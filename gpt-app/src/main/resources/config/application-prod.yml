@@ -2,8 +2,8 @@ server:
   port: 80
 
 wChat:
-  appID: wxc86fcb9788d36e3d
-  appSecret: b8970404f64b91721c73a15387e81a33
-  gzhName: gh_ab5d4378c71d
+  appID: wxbb9e848f82184d36
+  appSecret: e07cf6da51168724a81e2bcf4826da07
+  gzhName: gh_1b0f23f168a4
   token: shit
 

@@ -1,2 +1,14 @@
 shit:
   value1: shit1
+
+robot:
+  name: 只因
+
+
+openAi:
+  practice:
+    model: gpt-3.5-turbo
+    token: 1000
+    prompt: 你是远近小有名气的运势预测师,专业给别人预测运势的
+  chat:
+    model: gpt-3.5-turbo

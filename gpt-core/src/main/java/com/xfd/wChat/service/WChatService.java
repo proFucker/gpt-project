@@ -3,10 +3,13 @@ package com.xfd.wChat.service;
 import com.google.common.cache.Cache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListenableFutureTask;
 import com.xfd.common.StatusMatcher;
 import com.xfd.common.UserCacheService;
 import com.xfd.common.dao.UserCommonInfo;
 import com.xfd.common.mapper.UserCommonInfoMapper;
+import com.xfd.openai.service.GPTService;
 import com.xfd.wChat.practise.ChatStatus;
 import com.xfd.common.WChatContext;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +34,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -93,6 +98,8 @@ public class WChatService {
         statusMatchers.add(new ReplenishUserDetailMatcher5Job());
         statusMatchers.add(new ReplenishUserDetailMatcher6HeightWeight());
         statusMatchers.add(new PracticingMatcher());
+        statusMatchers.add(new PracticeResultQueryMatcher());
+        statusMatchers.add(new PracticeResultQueryMatcher2());
         allMissMatcher = new AllMissMatcher();
     }
 
@@ -142,10 +149,10 @@ public class WChatService {
                 returnMsg = boxTextWxReturnMessage("这图好好看");
                 break;
             case WxConsts.XmlMsgType.VOICE:
-                returnMsg = boxTextWxReturnMessage("小优听不懂,只看得懂文字哦");
+                returnMsg = boxTextWxReturnMessage("只因听不懂,只看得懂文字哦");
                 break;
             default:
-                returnMsg = boxTextWxReturnMessage("小优还不够智能,请再次输入");
+                returnMsg = boxTextWxReturnMessage("只因还不够智能,请再次输入");
                 break;
         }
         String rtn = XStreamTransformer.toXml(WxMpXmlMessage.class, returnMsg);
@@ -168,25 +175,12 @@ public class WChatService {
         }
         log.info("practice_contextInfo:status = {},whichProcessor={}", chatStatus, whichMatch.getClass().getSimpleName());
         boxTextWxMsg(WChatContext.getWxOutMsg());
-
-//        WxMpXmlMessage answer = new WxMpXmlMessage();
-//        UserCommonInfo userCommonInfo = null;
-//        switch (chatStatus) {
-//
-//
-//            case PREDICTING:
-//                answer.setContent("小优还在施法中,请耐心等一等哦");
-//                break;
-//
-//        }
-
-//        boxTextWxMsg(answer);
         return WChatContext.getWxOutMsg();
     }
 
 
-    @Autowired
-    UserCommonInfoMapper userCommonInfoMapper;
+//    @Autowired
+//    UserCommonInfoMapper userCommonInfoMapper;
 
     private static Set<String> validDestinySelect = Sets.newHashSet("1", "2", "3", "4", "5", "6",
         "事业", "爱情", "友情", "财运", "其他", "随便");
@@ -219,6 +213,9 @@ public class WChatService {
         userCacheService.updateChatStatus(status);
     }
 
+    @Autowired
+    GPTService gptService;
+
     private void predict() {
         //mock
 
@@ -242,44 +239,38 @@ public class WChatService {
             destinyStr);
 
         log.error("start_ky");
-        scheduledExecutorService.schedule(new Runnable() {
-            @Override
-            public void run() {
-                log.error("start_ky_1");
-                try {
-                    WChatContext.setDesigned(wChatContext);
-                    log.error("start_ky_2");
-                    WxMpKefuMessage wxMpKefuMessage = new WxMpKefuMessage();
-                    log.error("start_ky_3");
-                    wxMpKefuMessage.setContent(String.format("你好,你的运势预测出来了,请求串是:%s", query));
-                    wxMpKefuMessage.setToUser(wChatContext.getUser());
-                    wxMpKefuMessage.setMsgType(WxConsts.KefuMsgType.TEXT);
-                    boolean success = wxMpService.getKefuService().sendKefuMessage(wxMpKefuMessage);
-                    if (!success) {
-                        log.error("kefu_error");
-                    } else {
-                        log.error("kefu_success");
-                        updateUserWChatStatus(ChatStatus.JUST_ENTER);
-                    }
-                } catch (Throwable e) {
-                    log.error("kefu_error", e);
-                } finally {
-                    WChatContext.clear();
-                }
 
+        ListenableFutureTask<String> futureTask = ListenableFutureTask.create((Callable<String>) () -> {
+
+            try {
+                WChatContext.setDesigned(wChatContext);
+                String result = gptService.practise(query);
+                updateUserWChatStatus(ChatStatus.PREDICT_SUCCESS);
+                userCacheService.updateUserCache(practiseResultKey, result);
+                return result;
+            } catch (Throwable e) {
+                updateUserWChatStatus(ChatStatus.PREDICT_FAIL);
+                return null;
+            } finally {
+                WChatContext.clear();
             }
-        }, 10, TimeUnit.SECONDS);
+
+        });
+        scheduledExecutorService.schedule(futureTask, 10, TimeUnit.MILLISECONDS);
+
     }
 
+    static String practiseResultKey = "practise_result";
+
     private void firstHelpAnswer() {
-        WChatContext.setAnswerContent("这里是小优,有什么可以帮您?\n" +
+        WChatContext.setAnswerContent("这里是只因,有什么可以帮您?\n" +
             "预测运势请输入\"1,运势\"\n" +
             "查看旅游攻略请输入\"2,旅游\"\n请输入前面的数字");
         updateUserWChatStatus(ChatStatus.SELECTING_MENU);
     }
 
     private void selectWhich2PracticeAnswer() {
-        WChatContext.setAnswerContent("小优明白了,你想预测哪方面的运势捏?\n1,事业\n2,爱情\n3,友情\n4,财运\n5,随便\n请输入前面的数字");
+        WChatContext.setAnswerContent("只因明白了,你想预测哪方面的运势捏?\n1,事业\n2,爱情\n3,友情\n4,财运\n5,随便\n请输入前面的数字");
         updateUserWChatStatus(ChatStatus.SELECTING_DESTINY);
     }
 
@@ -487,7 +478,7 @@ public class WChatService {
             } else {
                 userCacheService.updateUserCache("practice_recent_info", cacheDescribe + "," + describe);
             }
-            WChatContext.setAnswerContent("嗯嗯,小优在听,还有吗?没有请输入\"没了\"");
+            WChatContext.setAnswerContent("嗯嗯,只因在听,还有吗?没有请输入\"没了\"");
         }
     }
 
@@ -587,7 +578,7 @@ public class WChatService {
         @Override
         public void action() {
             updateUserWChatStatus(ChatStatus.PREDICTING);
-            WChatContext.setAnswerContent("小优开始施法了,请耐心等一下");
+            WChatContext.setAnswerContent("只因开始施法了,请稍后输入任意内容查询");
             predict();
         }
     }
@@ -627,7 +618,7 @@ public class WChatService {
 
         @Override
         public boolean match() {
-            log.error("shit,{},{},{}",getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
+            log.error("shit,{},{},{}", getUserWChatStatus() == ChatStatus.REPLENISH_SELF_DETAIL &&
                     (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 1,
                 (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP) == 1,
                 (int) userCacheService.getUserCache(REPLENISH_SELF_DETAIL_STEP));
@@ -689,7 +680,7 @@ public class WChatService {
             ((UserCommonInfo) userCacheService.getUserCache(REPLENISH_SELF_DETAIL)).setHeightWeight(WChatContext.getInputContent());
             userCacheService.updateUserCache(REPLENISH_SELF_DETAIL_STEP, 5);
             updateUserWChatStatus(ChatStatus.PREDICTING);
-            WChatContext.setAnswerContent("小优开始施法了,请耐心等一下");
+            WChatContext.setAnswerContent("只因开始施法了,请稍后输入任意内容查询");
             predict();
         }
     }
@@ -703,7 +694,36 @@ public class WChatService {
 
         @Override
         public void action() {
-            WChatContext.setAnswerContent("小优正在施法中,请耐心等一下");
+            WChatContext.setAnswerContent("只因正在施法中,请耐心等一下");
+        }
+    }
+
+    private class PracticeResultQueryMatcher implements StatusMatcher {
+
+        @Override
+        public boolean match() {
+            return getUserWChatStatus() == ChatStatus.PREDICT_SUCCESS;
+        }
+
+        @Override
+        public void action() {
+            String practiceResult = userCacheService.getUserCache(practiseResultKey);
+            WChatContext.setAnswerContent(practiceResult);
+            updateUserWChatStatus(ChatStatus.JUST_ENTER);
+        }
+    }
+
+    private class PracticeResultQueryMatcher2 implements StatusMatcher {
+
+        @Override
+        public boolean match() {
+            return getUserWChatStatus() == ChatStatus.PREDICT_FAIL;
+        }
+
+        @Override
+        public void action() {
+            WChatContext.setAnswerContent("只因魔力不足失败了...请重新预测吧");
+            updateUserWChatStatus(ChatStatus.JUST_ENTER);
         }
     }
 
